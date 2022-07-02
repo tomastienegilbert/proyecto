@@ -6,27 +6,27 @@
         <div class="form-group row w-50 m-auto">
             <div class="form-group col-12 col-sm-6">
                 <label>Email</label>
-                <input name="email" class="form-control m-auto" disabled value="{{skater.email}}" />
+                <input name="email" class="form-control m-auto" disabled value="{{user.email}}" />
             </div>
             <div class="form-group col-12 col-sm-6">
                 <label>Nombre</label>
-                <input name="nombre" class="form-control m-auto" value="{{skater.nombre}}" />
+                <input name="nombre" class="form-control m-auto" value="{{user.nombre}}" />
             </div>
             <div class="form-group col-12 col-sm-6">
                 <label>Password</label>
-                <input name="password" type="password" class="form-control m-auto" value="{{skater.password}}" />
+                <input name="password" type="password" class="form-control m-auto" value="{{user.password}}" />
             </div>
             <div class="form-group col-12 col-sm-6">
                 <label>Repita la password</label>
-                <input type="password" class="form-control m-auto" value="{{skater.password}}" />
+                <input type="password" class="form-control m-auto" value="{{user.password}}" />
             </div>
             <div class="form-group col-12 col-sm-6">
                 <label>Años de experiencia</label>
-                <input name="años_experiencia" class="form-control m-auto" value="{{skater.anos_experiencia}}" />
+                <input name="años_experiencia" class="form-control m-auto" value="{{user.anos_experiencia}}" />
             </div>
             <div class="form-group col-12 col-sm-6">
                 <label>Especialidad</label>
-                <input name="especialidad" class="form-control m-auto" value="{{skater.especialidad}}" />
+                <input name="especialidad" class="form-control m-auto" value="{{user.especialidad}}" />
             </div>
 
         </div>
@@ -42,11 +42,11 @@
 <script>
     const deleteBtn = document.getElementById("deleteBtn")
 
-    const id = `{{skater.id}}`
+    const id = `{{user .id}}`
     deleteBtn.addEventListener("click", async () => {
 
         try {
-            const { data: token } = await axios.delete(`/skaters/${id}`)
+            const { data: token } = await axios.delete(`/users/${id}`)
             alert("Usuario eliminado con éxito")
             window.location = `/`
         } catch ({ response }) {

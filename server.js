@@ -83,16 +83,16 @@ app.post("/users", async (req, res) => {
 //4. Implementar seguridad y restricción de recursos o contenido con JWT
 app.get("/perfil", (req, res) => {
     const { token } = req.query
-    jwt.verify(token, secretKey, (err, skater) => {
-        if (err) {
-            res.status(500).send({
-                error: `Algo salió mal...`,
-                message: err.message,
-                code: 500
-            })
-        } else {
-            res.render("Perfil", { skater });
-        }
+    jwt.verify(token, secretKey, (err, user) => {
+        // if (err) {
+        //     res.status(500).send({
+        //         error: `Algo salió mal...`,
+        //         message: err.message,
+        //         code: 500
+        //     })
+        // } else {
+            res.render("Perfil", { user });
+        // }
     })
 });
 
