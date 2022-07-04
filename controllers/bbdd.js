@@ -31,8 +31,19 @@ const editarUsuario = async (user) => {
   return result.rows[0];
 }
 
+//Crear Playlist
+const nuevaPlaylist = async (playlist) => {
+  // const usuarioPlaylist = encontrar metodo que indique el id del usuario correspondiente
+  const values = Object.values(playlist)
+  const result = await pool.query(
+    `INSERT INTO playlist ( nombre_playlist , id_usuario , fecha_creacion ) values ($1, $2, NOW()) RETURNING *`
+    , values);
+  return result.rows[0];
+}
+
 modules.exports = {
   nuevoUsuario,
   obtenerUsuarios,
   editarUsuario,
+  nuevaPlaylist
 }
