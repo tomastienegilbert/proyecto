@@ -80,6 +80,16 @@ const eliminarCancion = async (cancion) => {
   return result.rows[0];
 }
 
+//eliminar todas las canciones de una playlist
+const vaciarPlaylist = async (canciones) => {
+  const values = Object.values(canciones)
+  const result = await pool.query(
+    `DELETE FROM canciones WHERE id_playlist = $1 RETURNING *`
+    , values);
+  return result.rows[0];
+}
+
+
 modules.exports = {
   nuevoUsuario,
   obtenerUsuarios,
@@ -90,4 +100,5 @@ modules.exports = {
   agregarCancion,
   obtenerCanciones,
   eliminarCancion,
+  vaciarPlaylist,
 }
