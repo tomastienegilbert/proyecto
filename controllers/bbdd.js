@@ -57,10 +57,25 @@ const editarPlaylist = async (playlist) => {
 }
 
 //Agregar canciones a una playlists
-const agregarCanciones = async (playlist) => {
+const agregarCancion = async (playlist) => {
   const values = Object.values(playlist)
   const result = await pool.query(
     `INSERT INTO canciones ( titulo, album, artista, comentario, enlace, id_playlist ) values ($1, $2, $3, $4, $5, $6) RETURNING *`
+    , values);
+  return result.rows[0];
+}
+
+//Obtener Canciones
+const obtenerCanciones = async () => {
+  const result = await pool.query(`SELECT * FROM canciones`);
+  return result.rows;
+}
+
+//eliminar cancion
+const eliminarCancion = async (cancion) => {
+  const values = Object.values(cancion)
+  const result = await pool.query(
+    `DELETE FROM canciones WHERE id = $1 RETURNING *`
     , values);
   return result.rows[0];
 }
@@ -72,5 +87,7 @@ modules.exports = {
   nuevaPlaylist,
   obtenerPlaylists,
   editarPlaylist,
-  
+  agregarCancion,
+  obtenerCanciones,
+  eliminarCancion,
 }
