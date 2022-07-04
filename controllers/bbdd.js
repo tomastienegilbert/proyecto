@@ -41,6 +41,19 @@ const nuevaPlaylist = async (playlist) => {
   return result.rows[0];
 }
 
+const obtenerPlaylists = async () => {
+  const result = await pool.query(`SELECT * FROM playlist`);
+  return result.rows;
+}
+
+const editarPlaylist = async (playlist) => {
+  const values = Object.values(playlist)
+  const result = await pool.query(
+    `UPDATE playlist SET nombre_playlist = $1 WHERE id = $4 RETURNING *`
+    , values);
+  return result.rows[0];
+}
+
 modules.exports = {
   nuevoUsuario,
   obtenerUsuarios,
