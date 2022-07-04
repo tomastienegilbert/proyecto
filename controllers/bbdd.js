@@ -98,6 +98,16 @@ const editarCancion = async (cancion) => {
   return result.rows[0];
 }
 
+//Obtener playlist de un usuario
+const playlistUsuario = async (canciones) => {
+  const values = Object.values(canciones)
+  const result = await pool.query(
+    `SELECT * FROM canciones WHERE id_playlist = $1`
+    , values);
+  return result.rows;
+}
+
+
 
 modules.exports = {
   nuevoUsuario,
@@ -111,4 +121,5 @@ modules.exports = {
   eliminarCancion,
   vaciarPlaylist,
   editarCancion,
+  playlistUsuario,
 }
