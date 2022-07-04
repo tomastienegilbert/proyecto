@@ -89,6 +89,15 @@ const vaciarPlaylist = async (canciones) => {
   return result.rows[0];
 }
 
+//editar cancion
+const editarCancion = async (cancion) => {
+  const values = Object.values(cancion)
+  const result = await pool.query(
+    `UPDATE canciones SET titulo = $1, album = $2, artista = $3, comentario = $4, enlace = $5 WHERE id = $6 RETURNING *`
+    , values);
+  return result.rows[0];
+}
+
 
 modules.exports = {
   nuevoUsuario,
@@ -101,4 +110,5 @@ modules.exports = {
   obtenerCanciones,
   eliminarCancion,
   vaciarPlaylist,
+  editarCancion,
 }
