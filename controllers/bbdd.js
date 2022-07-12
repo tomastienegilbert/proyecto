@@ -1,4 +1,5 @@
-const { Pool } = require("pg");
+const { query } = require("express");
+const { Pool, Query } = require("pg");
 const pool = new Pool({
   user: "postgres",
   host: "localhost",
@@ -8,25 +9,25 @@ const pool = new Pool({
 });
 
 // crear nuevo usuario
-const nuevoUsuario = async (user) => {
-  const values = Object.values(user)
+const nuevoUsuario = async (usuario) => {
+  const values = Object.values(usuario)
   const result = await pool.query(
-    `INSERT INTO users ( email , password , nombre , apellido , fecha_muerte ) values ($1, $2, $3, $4, $5 ) RETURNING *`
-    , values);
-  return result.rows[0];
+  `INSERT INTO usuarios ( email, password, nombre, apellido, fecha_muerte ) values ($1, $2, $3, $4, $5) RETURNING *`,
+  values);
+  return result.rows[0]
 }
 
 //obtener usuarios de la base de datos
 const obtenerUsuarios = async () => {
-  const result = await pool.query(`SELECT * FROM users`);
+  const result = await pool.query(`SELECT * FROM usuarios`);
   return result.rows;
 }
 
 //Editar usuario
-const editarUsuario = async (user) => {
-  const values = Object.values(user)
+const editarUsuario = async (usuario) => {
+  const values = Object.values(usuario)
   const result = await pool.query(
-    `UPDATE users SET email = $1, password = $2, nombre = $3, apellido = $4, fecha_muerte = $5 WHERE id = $6 RETURNING *`
+    `UPDATE usuarios SET email = '$1', password = '$2', nombre = '$3', apellido = '$4', fecha_muerte = '$5' WHERE id = '$6' RETURNING *`
     , values);
   return result.rows[0];
 }
@@ -36,14 +37,14 @@ const nuevaPlaylist = async (playlist) => {
   // const usuarioPlaylist = encontrar metodo que indique el id del usuario correspondiente
   const values = Object.values(playlist)
   const result = await pool.query(
-    `INSERT INTO playlist ( nombre_playlist , id_usuario , fecha_creacion ) values ($1, $2, NOW()) RETURNING *`
+    `INSERT INTO playlists ( nombre_playlist, id_usuario, fecha_creacion ) values ($1, $2, NOW()) RETURNING *`
     , values);
   return result.rows[0];
 }
 
 //Obtener Playlists
 const obtenerPlaylists = async () => {
-  const result = await pool.query(`SELECT * FROM playlist`);
+  const result = await pool.query(`SELECT * FROM playlists`);
   return result.rows;
 }
 
@@ -51,7 +52,7 @@ const obtenerPlaylists = async () => {
 const editarPlaylist = async (playlist) => {
   const values = Object.values(playlist)
   const result = await pool.query(
-    `UPDATE playlist SET nombre_playlist = $1 WHERE id = $4 RETURNING *`
+    `UPDATE playlist SET nombre_playlist = $1 WHERE id = $2 RETURNING *`
     , values);
   return result.rows[0];
 }
@@ -109,7 +110,7 @@ const playlistUsuario = async (canciones) => {
 
 
 
-modules.exports = {
+module.exports = {
   nuevoUsuario,
   obtenerUsuarios,
   editarUsuario,
@@ -121,5 +122,5 @@ modules.exports = {
   eliminarCancion,
   vaciarPlaylist,
   editarCancion,
-  playlistUsuario,
+  playlistUsuario
 }

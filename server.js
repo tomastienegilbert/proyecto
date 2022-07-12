@@ -2,17 +2,22 @@
 const express = require("express");
 const app = express();
 const exphbs = require("express-handlebars");
-const expressFileUpload = require("express-fileupload");
 const jwt = require("jsonwebtoken");
 const secretKey = "Shhhh";
 const chalk = require("chalk");
 const {
-    newUser,
-    getCanciones,
-    getSkater,
-    updateSkater,
-    deleteSkater,
-    setSkaterStatus,
+    nuevoUsuario,
+    obtenerUsuarios,
+    editarUsuario,
+    nuevaPlaylist,
+    obtenerPlaylists,
+    editarPlaylist,
+    agregarCancion,
+    obtenerCanciones,
+    editarCancion,
+    eliminarCancion,
+    vaciarPlaylist,
+    playlistUsuario
 } = require("./controllers/bbdd.js");
 
 
@@ -24,13 +29,6 @@ app.listen(3000, () => console.log(chalk.green.bold("Servidor encendido en puert
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(express.static(__dirname + "/public"));
-// app.use(
-//     expressFileUpload({
-//         limits: 5000000,
-//         abortOnLimit: true,
-//         responseOnLimit: "El tamaño de la imagen supera el límite permitido",
-//     })
-// );
 app.use("/css", express.static(__dirname + "/node_modules/bootstrap/dist/css"));
 
 //2. Servir contenido dinámico con express-handlebars
@@ -39,16 +37,17 @@ app.engine(
     exphbs({
         defaultLayout: "main",
         layoutsDir: `${__dirname}/views/mainLayout`,
+        partialsDir: __dirname + "/views/componentes/",
     })
 );
 app.set("view engine", "handlebars");
+    
 
 // Rutas
 
 //1. Crear una API REST con el Framework Express
 app.get("/", async (req, res) => {
     try {
-        // const skaters = await getSkaters()
         res.render("Home");
     } catch (e) {
         res.status(500).send({
@@ -63,13 +62,52 @@ app.get("/registro", (req, res) => {
     res.render("Registro");
 });
 
+//Renderear vista de ingreso
+app.get("/ingreso", (req, res) => {
+    res.render("Ingreso");
+});
+
+//Renderear vista crear playlist
+app.get("/crearplaylist", (req, res) => {
+    res.render("CrearPlaylist");
+});
+
+//renderear vista editar playlist
+app.get("/editarplaylist", (req, res) => {
+    res.render("EditarPlaylist");
+});
+
+//Renderear vista de Agregar Canciones
+app.get("/agregarCanciones", (req, res) => {
+        res.render("AgregarCanciones");
+ }); 
+
+ //Renderear vista de editar datos de perfil
+ app.get("/configPerfil", (req, res) => {
+    const { token } = req.query
+    jwt.verify(token, secretKey, (err, usuario) => {
+    // if (err) {
+    //     res.status(500).send({
+    //         error: `Algo salió mal...`,
+    //         message: err.message,
+    //         code: 500
+    //     })
+    // } else {
+        res.render("configPerfil", { usuario });
+    // }
+    })
+ }); 
+
+
+
 //registrar nuevo usuario
-app.post("/users", async (req, res) => {
+app.post("/usuarios", async (req, res) => {
     const { email, password, nombre, apellido, fecha_muerte } = req.body;
     console.log(req.body);
     try {
-        const user = await newUser({ email, password, nombre, apellido, fecha_muerte });
-        res.redirect("/perfil");
+        const usuario = await nuevoUsuario({ email, password, nombre, apellido, fecha_muerte });
+        res.redirect("/crearplaylist");
+        console.log(req.body);
     }
     catch (e) {
         res.status(500).send({
@@ -77,137 +115,112 @@ app.post("/users", async (req, res) => {
             code: 500
         })
     }
-}
-);
-
-//4. Implementar seguridad y restricción de recursos o contenido con JWT
-app.get("/perfil", (req, res) => {
-    const { token } = req.query
-    jwt.verify(token, secretKey, (err, skater) => {
-        if (err) {
-            res.status(500).send({
-                error: `Algo salió mal...`,
-                message: err.message,
-                code: 500
-            })
-        } else {
-            res.render("Perfil", { skater });
-        }
-    })
 });
 
-app.get("/login", (req, res) => {
-    res.render("Login");
-});
-
-//4. Implementar seguridad y restricción de recursos o contenido con JWT
-app.post("/login", async (req, res) => {
-    const { email, password } = req.body
+//Obtener usuarios de la base de datos
+app.get("/usuarios", async (req, res) => {
     try {
-        const skater = await getSkater(email, password)
-        const token = jwt.sign(skater, secretKey)
-        res.status(200).send(token)
-    } catch (e) {
-        console.log(e)
-        res.status(500).send({
-            error: `Algo salió mal... ${e}`,
-            code: 500
-        })
-    };
-});
-
-app.get("/Admin", async (req, res) => {
-    try {
-        const skaters = await getSkaters();
-        res.render("Admin", { skaters });
+        const usuarios = await obtenerUsuarios();
+        res.send(usuarios);
     } catch (e) {
         res.status(500).send({
             error: `Algo salió mal... ${e}`,
             code: 500
         })
-    };
-});
+    }
+})
 
-
-// API REST de Skaters
-
-app.get("/skaters", async (req, res) => {
-
+//obtener playlists de base de datos
+app.get("/playlists", async (req, res) => {
     try {
-        const skaters = await getSkaters()
-        res.status(200).send(skaters);
+        const playlists = await obtenerPlaylists();
+        res.send(playlists);
     } catch (e) {
         res.status(500).send({
             error: `Algo salió mal... ${e}`,
             code: 500
         })
-    };
+    }
 });
 
-// //3. Ofrecer la funcionalidad Upload File con express-fileupload
-// app.post("/registro", async (req, res) => {
-//     const skater = req.body;
-//     if (Object.keys(req.files).length == 0) {
-//         return res.status(400).send("No se encontro ningun archivo en la consulta");
-//     }
-//     const { files } = req
-//     const { foto } = files;
-//     const { name } = foto;
-//     const pathPhoto = `/uploads/${name}`
-//     foto.mv(`${__dirname}/public${pathPhoto}`, async (err) => {
-//         try {
-//             if (err) throw err
-//             skater.foto = pathPhoto
-//             await newSkater(skater);
-//             res.status(201).redirect("/login");
-//         } catch (e) {
-//             console.log(e)
-//             res.status(500).send({
-//                 error: `Algo salió mal... ${e}`,
-//                 code: 500
-//             })
-//         };
-
-//     });
-// })
-
-app.put("/skaters", async (req, res) => {
-    const skater = req.body;
+//obtener canciones de la base de datos
+app.get("/canciones", async (req, res) => {
     try {
-        await updateSkater(skater);
-        res.status(200).send("Datos actualizados con éxito");
+        const canciones = await obtenerCanciones();
+        res.send(canciones);
     } catch (e) {
         res.status(500).send({
             error: `Algo salió mal... ${e}`,
             code: 500
         })
-    };
+    }
 });
 
-app.put("/skaters/status/:id", async (req, res) => {
-    const { id } = req.params;
-    const { estado } = req.body;
+// Editar datos de usuario
+app.put("/usuarios", async (req, res) => {
+    const { email, password, nombre, apellido, fecha_muerte } = req.body;
+    const id_usuario = 1;
     try {
-        await setSkaterStatus(id, estado);
-        res.status(200).send("Estatus de skater cambiado con éxito");
-    } catch (e) {
+        const usuario = await editarUsuario({id_usuario, email, password, nombre, apellido, fecha_muerte });
+        res.redirect("/agregarcanciones");
+        console.log(req.body);
+    }
+    catch (e) {
         res.status(500).send({
             error: `Algo salió mal... ${e}`,
             code: 500
         })
-    };
+    }
 });
 
-app.delete("/skaters/:id", async (req, res) => {
-    const { id } = req.params
+//crear nueva playlist
+app.post("/playlists", async (req, res) => {
+    const { nombre_playlist } = req.body;
+    const id_usuario = 1;
+    console.log(req.body);
     try {
-        await deleteSkater(id)
-        res.status(200).send();
-    } catch (e) {
+        const playlist = await nuevaPlaylist({ nombre_playlist, id_usuario });
+        res.redirect("/agregarCanciones");
+        console.log(playlist);   }
+    catch (e) {
         res.status(500).send({
             error: `Algo salió mal... ${e}`,
             code: 500
         })
-    };
+    }
 });
 
+// edtar playlist
+app.put("/playlists", async (req, res) => {
+    const { nombre_playlist } = req.body;
+    const id = 1;
+    console.log(req.body);
+    try {
+        const playlist = await editarPlaylist({ nombre_playlist, id });
+        res.redirect("/agregarCanciones");
+        console.log(req.body);   }
+    catch (e) {
+        res.status(500).send({
+            error: `Algo salió mal... ${e}`,
+            code: 500
+        })
+    }
+});
+
+//agregar canciones
+app.post("/canciones", async (req, res) => {
+    const { titulo, album, artista, comentario, enlace } = req.body;
+    const id_playlist = 1;
+    console.log(req.body);
+    try {
+        const cancion = await agregarCancion({ titulo, album, artista, comentario, enlace, id_playlist });
+        res.redirect("/agregarCanciones");
+        console.log(cancion);
+    }
+    catch (e) {
+        res.status(500).send({
+            error: `Algo salió mal... ${e}`,
+            code: 500
+        })
+    }
+});
