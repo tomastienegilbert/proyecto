@@ -9,19 +9,37 @@ const pool = new Pool({
 });
 
 // crear nuevo usuario
-const nuevoUsuario = async (usuario) => {
-  const values = Object.values(usuario)
-  const result = await pool.query(
-  `INSERT INTO usuarios ( email, password, nombre, apellido, fecha_muerte ) values ($1, $2, $3, $4, $5) RETURNING *`,
-  values);
+const nuevoUsuario = async ( { nombre, apellido, email, password, fecha_muerte } ) => {
+  const result = await pool.query({
+    text: `INSERT INTO usuarios ( nombre, apellido, email, password, fecha_muerte ) VALUES ( $1, $2, $3, $4, $5 ) RETURNING *`,
+    values: [ nombre, apellido, email, password, fecha_muerte ]
+  })
   return result.rows[0]
-}
+};
 
 //obtener usuarios de la base de datos
 const obtenerUsuarios = async () => {
   const result = await pool.query(`SELECT * FROM usuarios`);
   return result.rows;
 }
+
+//obtenerUsuarioEmail
+const obtenerUsuarioPorEmail = async (email) => {
+  const result = await pool.query({
+    text: `SELECT * FROM usuarios WHERE email = $1`,
+    values: [email]
+  })
+  return result.rows[0];
+}
+
+//Crear Playlist
+const nuevaPlaylist = async ( { id_usuario, nombre_playlist } ) => {
+  const result = await pool.query({
+    text: `INSERT INTO playlists ( id_usuario, nombre_playlist, fecha_creacion ) VALUES ( $1, $2, NOW()) RETURNING *`,
+    values: [ id_usuario, nombre_playlist ]
+  })
+  return result.rows[0]
+};
 
 //Editar usuario
 const editarUsuario = async (usuario) => {
@@ -32,15 +50,6 @@ const editarUsuario = async (usuario) => {
   return result.rows[0];
 }
 
-//Crear Playlist
-const nuevaPlaylist = async (playlist) => {
-  // const usuarioPlaylist = encontrar metodo que indique el id del usuario correspondiente
-  const values = Object.values(playlist)
-  const result = await pool.query(
-    `INSERT INTO playlists ( nombre_playlist, id_usuario, fecha_creacion ) values ($1, $2, NOW()) RETURNING *`
-    , values);
-  return result.rows[0];
-}
 
 //Obtener Playlists
 const obtenerPlaylists = async () => {
@@ -113,6 +122,7 @@ const playlistUsuario = async (canciones) => {
 module.exports = {
   nuevoUsuario,
   obtenerUsuarios,
+  obtenerUsuarioPorEmail,
   editarUsuario,
   nuevaPlaylist,
   obtenerPlaylists,

@@ -5,9 +5,11 @@ const exphbs = require("express-handlebars");
 const jwt = require("jsonwebtoken");
 const secretKey = "Shhhh";
 const chalk = require("chalk");
+const bcrypt = require("bcrypt");
 const {
     nuevoUsuario,
     obtenerUsuarios,
+    obtenerUsuarioPorEmail, 
     editarUsuario,
     nuevaPlaylist,
     obtenerPlaylists,
@@ -30,6 +32,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(express.static(__dirname + "/public"));
 app.use("/css", express.static(__dirname + "/node_modules/bootstrap/dist/css"));
+app.use("/js", express.static(__dirname + "/node_modules/bootstrap/dist/js"));
+app.use(express.static(__dirname + "/node_modules/axios/dist"));
 
 //2. Servir contenido dinámico con express-handlebars
 app.engine(
@@ -77,8 +81,19 @@ app.get("/editarplaylist", (req, res) => {
     res.render("EditarPlaylist");
 });
 
-//Renderear vista de Agregar Canciones
-app.get("/agregarCanciones", (req, res) => {
+//Renderear vista de Agregar Canciones con autorizacion
+app.get("/agregarcanciones", async (req, res, next) => {
+    const token = req.headers.authorization;
+    if (!token) return res.status(401).send("Falta el token");
+
+    jwt.verify(token, secret_key, (err, decoded) => {
+        if (err) {
+            return res.status(401).send("Token inválido")
+        }
+    });
+    next();
+},
+    async (req, res) => {
         res.render("AgregarCanciones");
  }); 
 
@@ -102,12 +117,17 @@ app.get("/agregarCanciones", (req, res) => {
 
 //registrar nuevo usuario
 app.post("/usuarios", async (req, res) => {
-    const { email, password, nombre, apellido, fecha_muerte } = req.body;
-    console.log(req.body);
     try {
-        const usuario = await nuevoUsuario({ email, password, nombre, apellido, fecha_muerte });
-        res.redirect("/crearplaylist");
-        console.log(req.body);
+    const { email, password, nombre, apellido, fecha_muerte, nombre_playlist } = req.body;
+    
+    //encryptar password con bcrypt
+    const encriptarPassword = await bcrypt.hash(password, 10);
+    
+
+    const usuario = await nuevoUsuario({ email, password: encriptarPassword, nombre, apellido, fecha_muerte });
+    
+    const playlist = await nuevaPlaylist({ nombre_playlist, id_usuario: usuario.id_usuario });
+    res.send("/ingreso");
     }
     catch (e) {
         res.status(500).send({
@@ -116,6 +136,37 @@ app.post("/usuarios", async (req, res) => {
         })
     }
 });
+
+//ingreso con jwt
+app.post("/ingresos", async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        if (!email) return res.sstatus(400).send("El email es obligatorio");
+        if (!password) return res.status(400).send("El password es obligatorio");
+
+        //obtener usuario por correo
+        const usuario = await obtenerUsuarioPorEmail(email);
+        if (!usuario) {
+            return res.status(400).send("Usuario inválido");
+        }
+
+
+        const passwordCorrecto = await bcrypt.compare(password, usuario.password);
+        if (!passwordCorrecto) {
+            return res.status(400).send("Credenciales Inválida");
+        }
+
+        //crear token con id_playlist de usuario logeado
+        const token = jwt.sign({ id_usuario: usuario.id_usuario }, secretKey);
+
+        res.status(200).send({usuario, token});
+    }
+    catch (e) {
+        res.status(500).send(e);
+    }
+})
+
+
 
 //Obtener usuarios de la base de datos
 app.get("/usuarios", async (req, res) => {
@@ -129,6 +180,7 @@ app.get("/usuarios", async (req, res) => {
         })
     }
 })
+
 
 //obtener playlists de base de datos
 app.get("/playlists", async (req, res) => {
@@ -157,55 +209,38 @@ app.get("/canciones", async (req, res) => {
 });
 
 // Editar datos de usuario
-app.put("/usuarios", async (req, res) => {
-    const { email, password, nombre, apellido, fecha_muerte } = req.body;
-    const id_usuario = 1;
-    try {
-        const usuario = await editarUsuario({id_usuario, email, password, nombre, apellido, fecha_muerte });
-        res.redirect("/agregarcanciones");
-        console.log(req.body);
-    }
-    catch (e) {
-        res.status(500).send({
-            error: `Algo salió mal... ${e}`,
-            code: 500
-        })
-    }
-});
+// app.put("/usuarios", async (req, res) => {
+//     const { email, password, nombre, apellido, fecha_muerte } = req.body;
+//     const id_usuario = 1;
+//     try {
+//         const usuario = await editarUsuario({id_usuario, email, password, nombre, apellido, fecha_muerte });
+//         res.redirect("/agregarcanciones");
+//         console.log(req.body);
+//     }
+//     catch (e) {
+//         res.status(500).send({
+//             error: `Algo salió mal... ${e}`,
+//             code: 500
+//         })
+//     }
+// });
 
-//crear nueva playlist
-app.post("/playlists", async (req, res) => {
-    const { nombre_playlist } = req.body;
-    const id_usuario = 1;
-    console.log(req.body);
-    try {
-        const playlist = await nuevaPlaylist({ nombre_playlist, id_usuario });
-        res.redirect("/agregarCanciones");
-        console.log(playlist);   }
-    catch (e) {
-        res.status(500).send({
-            error: `Algo salió mal... ${e}`,
-            code: 500
-        })
-    }
-});
-
-// edtar playlist
-app.put("/playlists", async (req, res) => {
-    const { nombre_playlist } = req.body;
-    const id = 1;
-    console.log(req.body);
-    try {
-        const playlist = await editarPlaylist({ nombre_playlist, id });
-        res.redirect("/agregarCanciones");
-        console.log(req.body);   }
-    catch (e) {
-        res.status(500).send({
-            error: `Algo salió mal... ${e}`,
-            code: 500
-        })
-    }
-});
+// // edtar playlist
+// app.put("/playlists", async (req, res) => {
+//     const { nombre_playlist } = req.body;
+//     const id = 1;
+//     console.log(req.body);
+//     try {
+//         const playlist = await editarPlaylist({ nombre_playlist, id });
+//         res.redirect("/agregarCanciones");
+//         console.log(req.body);   }
+//     catch (e) {
+//         res.status(500).send({
+//             error: `Algo salió mal... ${e}`,
+//             code: 500
+//         })
+//     }
+// });
 
 //agregar canciones
 app.post("/canciones", async (req, res) => {

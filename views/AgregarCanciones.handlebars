@@ -20,7 +20,7 @@
                 <label>Comentario</label>
                 <input name="comentario" class="form-control m-auto" />
             </div>
-            <div class="form-group col-12 col-sm-6">
+            <div class="form-group col-12">
                 <label>Enlace</label>
                 <input name="enlace" class="form-control m-auto" />
             </div>
@@ -32,5 +32,14 @@
     </form>
  </div> 
 <script>
+    if (!localStorage.getItem('token')) {
+        window.location.replace = "/ingreso";
+    }
+
+    //async function obtenerUsuarios() {
+    //    const { data } = await axios.get('/usuarios');
+    //    console.log(data);
+    //}
+    //obtenerUsuarios();
 </script>
 
