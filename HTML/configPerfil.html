@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <title>La Playlist de tu Vida</title>
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+   <link rel="stylesheet" href="../public/css/estilos.css">
+   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+   <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+      crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <nav class="mb-5 navbar navbar-expand-lg navbar navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">LPDTV</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav justify-content-lg-between">
+            <li class="nav-item ">
+              <a class="nav-link" href="#">Perfil</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    <a href="/"><h1>La Playlist de tu vida</h1></a>
+    <div class="py-4">
+        <h2>Configuración del perfil</h2>
+        <hr class="w-50" />
+    
+        <form>
+            <div class="form-group row w-50 m-auto">
+                <div class="form-group col-12 col-sm-6">
+                    <label>E-mail</label>
+                    <input name="email" class="form-control m-auto" value="E-Mail de Usuario Registrado" />
+                </div>
+                <div class="form-group col-12 col-sm-6">
+                    <label>Nuevo Password</label>
+                    <input name="nombre" class="form-control m-auto"/>
+                </div>
+                <div class="form-group col-12 col-sm-6">
+                    <label>Confirme nuevo Password</label>
+                    <input name="nombre" class="form-control m-auto"/>
+                </div>
+                <div class="form-group col-12 col-sm-6">
+                    <label>Nombre</label>
+                    <input name="apellido" class="form-control m-auto" value="Nombre de Usuario Registrado" />
+                </div>
+                <div class="form-group col-12 col-sm-6">
+                    <label>Apellido</label>
+                    <input name="apellido" class="form-control m-auto" value="Apellido de Usuario Registrado" />
+                </div>
+                <div class="form-group col-12 col-sm-6">
+                    <label>Nueva Fecha de Muerte</label>
+                    <input name="fecha_muerte" class="form-control m-auto" type="date" value="Fecha de muerte registrada" />
+                </div>
+    
+            </div>
+            <div class="mb-1">
+                <button class="btn btn-primary" id="actualizarPerfil">Actualizar Datos</button>
+            </div>
+            <div>
+            </div>
+        </form>
+    </div>  
+</body>
+</html>

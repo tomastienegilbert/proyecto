@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <title>La Playlist de tu Vida</title>
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+   <link rel="stylesheet" href="../public/css/estilos.css">
+   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+   <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+      crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <nav class="mb-5 navbar navbar-expand-lg navbar navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">LPDTV</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav justify-content-lg-between">
+            <li class="nav-item ">
+              <a class="nav-link" href="#">Ingresa</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#"></a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+<a href="/"><h1>La Playlist de tu vida</h1></a>
+<div class="py-4">
+    <h2>Un registro pústumo de tu soundtrack</h2>
+    <hr/>
+    <div class="py-4">
+        <h2>Registro</h2>
+        <hr class="w-50" />
+    
+        <form action="/users" method="POST">
+            <div class="form-group row w-50 m-auto">
+                <div class="form-group col-12 col-sm-6">
+                    <label>Email</label>
+                    <input class="form-control m-auto" type="email" name="email" />
+                </div>
+                <div class="form-group col-12 col-sm-6">
+                    <label>Contraseña</label>
+                    <input class="form-control m-auto" type="password" />
+                </div>    
+            </div>
+            <button class="btn btn-info mb-3">Ingresa</button>
+        </form>
+    </div>
+</div>
+</body>
+
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <title>La Playlist de tu Vida</title>
+   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+   <link rel="stylesheet" href="../public/css/estilos.css">
+   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+   <script src="https://code.jquery.com/jquery-3.5.1.js" integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc="
+      crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <nav class="mb-5 navbar navbar-expand-lg navbar navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">LPDTV</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav justify-content-lg-between">
+            <li class="nav-item ">
+              <a class="nav-link" href="registro">Regístrate</a>
+            </li>
+            <li class="nav-item ">
+                <a class="nav-link" href="ingreso.html">Ingresa</a>
+              </li>
+          </ul>
+        </div>
+      </nav>
+<a href="/"><h1>La Playlist de tu vida</h1></a>
+<div class="py-4">
+    <h2>Un registro pústumo de tu soundtrack</h2>
+    <hr/>
+    <div class="py-4">
+        <h2>Crea tu Playlist</h2>
+        <hr class="w-50" />
+      
+        <form>
+            <div class="form-group row w-50 m-auto justify-content-center">
+                <div class="form-group col-12 col-sm-6">
+                    <label>Titulo</label>
+                    <input name="nombre_playlist" class="form-control m-auto" />
+                </div> 
+            </div>
+            <div class="mb-1">
+                <!-- <a href="cancionesPlaylist.html"><button class="btn btn-primary" id="agregarCancion">Crear</button></a> -->
+                <a href="cancionesPlaylist.html">¡Agrega canciones a tu playlist!</a>
+            </div>
+            <div>
+            </div>
+        </form>
+     </div>
+      
+     <script>
+        const borrarPlaylist = document.getElementById("borrarPlaylist")
+      
+        const id = `{{playlist .id}}`
+        borrarPlaylist.addEventListener("click", async () => {
+      
+            try {
+                const { data: token } = await axios.delete(`/playlists/${id}`)
+                alert("Playlist eliminada")
+                window.location = `/`
+            } catch ({ response }) {
+                const { data } = response
+                const { error } = data
+                alert(error)
+            }
+        })
+      
+        const form = document.querySelector("form")
+      
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault()
+      
+            let [nombre_playlist] = document.querySelectorAll("input")
+      
+            nombre_playlist = nombre_playlist.value
+     
+            // const playlist = {
+            //     nombre_playlist,
+            //     id_usuario: ,
+            //     fecha_creacion:,
+            // }
+            try {
+                await axios.post("/playlists", playlist)
+                alert("Playlist creada con éxito")
+                window.location = "/"
+            } catch ({ response }) {
+                const { data } = response
+                const { error } = data
+                alert(error)
+            }
+      
+        })
+     </script>
+     
+     
+</div>
+</body>
+
+</html>

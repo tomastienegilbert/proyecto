@@ -2,20 +2,26 @@
 const express = require("express");
 const app = express();
 const exphbs = require("express-handlebars");
-const expressFileUpload = require("express-fileupload");
 const jwt = require("jsonwebtoken");
-const secretKey = "Shhhh";
 const chalk = require("chalk");
+const bcrypt = require("bcrypt");
+const secret_key = "secret_key";
 const {
-    newUser,
-    getCanciones,
-    getSkater,
-    updateSkater,
-    deleteSkater,
-    setSkaterStatus,
+    nuevoUsuario,
+    obtenerUsuarios,
+    obtenerUsuarioPorEmail, 
+    editarUsuario,
+    nuevaPlaylist,
+    obtenerPlaylists,
+    editarPlaylist,
+    agregarCancion,
+    obtenerCanciones,
+    editarCancion,
+    eliminarCancion,
+    vaciarPlaylist,
+    playlistUsuario
 } = require("./controllers/bbdd.js");
-
-
+require('dotenv').config();523        
 
 // Server
 app.listen(3000, () => console.log(chalk.green.bold("Servidor encendido en puerto 3000!")));
@@ -24,14 +30,9 @@ app.listen(3000, () => console.log(chalk.green.bold("Servidor encendido en puert
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(express.static(__dirname + "/public"));
-// app.use(
-//     expressFileUpload({
-//         limits: 5000000,
-//         abortOnLimit: true,
-//         responseOnLimit: "El tamaño de la imagen supera el límite permitido",
-//     })
-// );
 app.use("/css", express.static(__dirname + "/node_modules/bootstrap/dist/css"));
+app.use("/js", express.static(__dirname + "/node_modules/bootstrap/dist/js"));
+app.use(express.static(__dirname + "/node_modules/axios/dist"));
 
 //2. Servir contenido dinámico con express-handlebars
 app.engine(
@@ -39,16 +40,14 @@ app.engine(
     exphbs({
         defaultLayout: "main",
         layoutsDir: `${__dirname}/views/mainLayout`,
+        partialsDir: __dirname + "/views/partials/",
     })
 );
 app.set("view engine", "handlebars");
 
-// Rutas
-
-//1. Crear una API REST con el Framework Express
+//Crear una API REST con el Framework Express
 app.get("/", async (req, res) => {
     try {
-        // const skaters = await getSkaters()
         res.render("Home");
     } catch (e) {
         res.status(500).send({
@@ -63,13 +62,19 @@ app.get("/registro", (req, res) => {
     res.render("Registro");
 });
 
-//registrar nuevo usuario
-app.post("/users", async (req, res) => {
-    const { email, password, nombre, apellido, fecha_muerte } = req.body;
-    console.log(req.body);
+// 1) registrar nuevo usuario con su playlist
+app.post("/usuarios", async (req, res) => {
     try {
-        const user = await newUser({ email, password, nombre, apellido, fecha_muerte });
-        res.redirect("/perfil");
+    const { email, password, nombre, apellido, fecha_muerte, nombre_playlist } = req.body;
+    
+    //encryptar password con bcrypt
+    const encriptarPassword = await bcrypt.hash(password, 10);
+    
+
+    const usuario = await nuevoUsuario({ email, password: encriptarPassword, nombre, apellido, fecha_muerte });
+    
+    const playlist = await nuevaPlaylist({ nombre_playlist, id_usuario: usuario.id_usuario });
+    res.send("/ingreso");
     }
     catch (e) {
         res.status(500).send({
@@ -77,8 +82,7 @@ app.post("/users", async (req, res) => {
             code: 500
         })
     }
-}
-);
+});
 
 //4. Implementar seguridad y restricción de recursos o contenido con JWT
 app.get("/perfil", (req, res) => {
@@ -96,118 +100,39 @@ app.get("/perfil", (req, res) => {
     })
 });
 
-app.get("/login", (req, res) => {
-    res.render("Login");
+app.get("/ingreso", (req, res) => {
+    res.render("Ingreso");
 });
 
 //4. Implementar seguridad y restricción de recursos o contenido con JWT
-app.post("/login", async (req, res) => {
-    const { email, password } = req.body
+app.post("/ingresos", async (req, res) => {
     try {
-        const skater = await getSkater(email, password)
-        const token = jwt.sign(skater, secretKey)
-        res.status(200).send(token)
-    } catch (e) {
-        console.log(e)
-        res.status(500).send({
-            error: `Algo salió mal... ${e}`,
-            code: 500
-        })
-    };
+      const { email, password } = req.body;
+      if (!email) return res.status(400).send("El email es requerido");
+      if (!password) return res.status(400).send("La contraseña es requerida");
+  
+      // obtener el usuario a partir del correo
+      const usuario = await obtenerUsuarioPorEmail(email);
+      if (!usuario) {
+        return res.status(400).send("Credenciales invalidas");
+      }
+  
+      const passwordValid = await bcrypt.compare(password, usuario.password);
+      if (!passwordValid) {
+        return res.status(400).send("Credenciales invalidas");
+      }
+  
+      const token = jwt.sign({ id: usuario.id, email }, secret_key);
+      delete usuario.password;
+  
+      res.status(200).send({ usuario, token });
+    } catch (error) {
+      res.status(500).send(error);
+    }
+  });
+  
+
+// private routes
+app.get("/agregarcanciones", (req, res) => {
+    res.render("AgregarCanciones", { requiereAuth: true });
 });
-
-app.get("/Admin", async (req, res) => {
-    try {
-        const skaters = await getSkaters();
-        res.render("Admin", { skaters });
-    } catch (e) {
-        res.status(500).send({
-            error: `Algo salió mal... ${e}`,
-            code: 500
-        })
-    };
-});
-
-
-// API REST de Skaters
-
-app.get("/skaters", async (req, res) => {
-
-    try {
-        const skaters = await getSkaters()
-        res.status(200).send(skaters);
-    } catch (e) {
-        res.status(500).send({
-            error: `Algo salió mal... ${e}`,
-            code: 500
-        })
-    };
-});
-
-// //3. Ofrecer la funcionalidad Upload File con express-fileupload
-// app.post("/registro", async (req, res) => {
-//     const skater = req.body;
-//     if (Object.keys(req.files).length == 0) {
-//         return res.status(400).send("No se encontro ningun archivo en la consulta");
-//     }
-//     const { files } = req
-//     const { foto } = files;
-//     const { name } = foto;
-//     const pathPhoto = `/uploads/${name}`
-//     foto.mv(`${__dirname}/public${pathPhoto}`, async (err) => {
-//         try {
-//             if (err) throw err
-//             skater.foto = pathPhoto
-//             await newSkater(skater);
-//             res.status(201).redirect("/login");
-//         } catch (e) {
-//             console.log(e)
-//             res.status(500).send({
-//                 error: `Algo salió mal... ${e}`,
-//                 code: 500
-//             })
-//         };
-
-//     });
-// })
-
-app.put("/skaters", async (req, res) => {
-    const skater = req.body;
-    try {
-        await updateSkater(skater);
-        res.status(200).send("Datos actualizados con éxito");
-    } catch (e) {
-        res.status(500).send({
-            error: `Algo salió mal... ${e}`,
-            code: 500
-        })
-    };
-});
-
-app.put("/skaters/status/:id", async (req, res) => {
-    const { id } = req.params;
-    const { estado } = req.body;
-    try {
-        await setSkaterStatus(id, estado);
-        res.status(200).send("Estatus de skater cambiado con éxito");
-    } catch (e) {
-        res.status(500).send({
-            error: `Algo salió mal... ${e}`,
-            code: 500
-        })
-    };
-});
-
-app.delete("/skaters/:id", async (req, res) => {
-    const { id } = req.params
-    try {
-        await deleteSkater(id)
-        res.status(200).send();
-    } catch (e) {
-        res.status(500).send({
-            error: `Algo salió mal... ${e}`,
-            code: 500
-        })
-    };
-});
-
