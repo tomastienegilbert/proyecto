@@ -32,14 +32,38 @@
     </form>
  </div> 
 <script>
-    if (!localStorage.getItem('token')) {
-        window.location.replace = "/ingreso";
+     const usuario = JSON.parse(localStorage.getItem('usuario'));
+    if (usuario) {
+        document.querySelector("img").setAttribute("src", usuario.foto);
+        let [email, name, password, repeat_password] = document.querySelectorAll("input");
+        email.value = usuario.email;
+        name.value = usuario.name;
+    } else {
+        location.replace('/');
     }
-
-    //async function obtenerUsuarios() {
-    //    const { data } = await axios.get('/usuarios');
-    //    console.log(data);
-    //}
-    //obtenerUsuarios();
+    const form = document.querySelector("form")
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault()
+        let [email, name, password, repeat_password] = document.querySelectorAll("input");
+        name = name.value
+        password = password.value
+        if (password !== repeat_password.value) {
+            return alert('Las contraseñas deben ser iguales');
+        }
+        if (!name || !password) {
+            return alert('Debes completar el formulario');
+        }
+        const usuario = {
+            name,
+            password
+        }
+        try {
+            await axios.put("/usuarios", usuario);
+            alert("Datos actualizados con éxito")
+            window.location = "/login"
+        } catch (error) {
+            console.log(error)
+        }
+    })
 </script>
 
