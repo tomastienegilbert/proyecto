@@ -57,6 +57,16 @@ const obtenerPlaylists = async () => {
   return result.rows;
 }
 
+//obtener playlist por id de usuario
+const obtenerPlaylistporIDUsuario = async (id_usuario) => {
+  const result = await pool.query({
+    text: `SELECT * FROM playlists WHERE id_usuario = $1`,
+    values: [id_usuario]
+  })
+  return result.rows;
+}
+
+
 //Editar Playlist
 const editarPlaylist = async (playlist) => {
   const values = Object.values(playlist)
@@ -126,6 +136,7 @@ module.exports = {
   editarUsuario,
   nuevaPlaylist,
   obtenerPlaylists,
+  obtenerPlaylistporIDUsuario,
   editarPlaylist,
   agregarCancion,
   obtenerCanciones,

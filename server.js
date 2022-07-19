@@ -13,6 +13,7 @@ const {
     editarUsuario,
     nuevaPlaylist,
     obtenerPlaylists,
+    obtenerPlaylistporIDUsuario,
     editarPlaylist,
     agregarCancion,
     obtenerCanciones,
@@ -116,13 +117,21 @@ app.post("/ingresos", async (req, res) => {
       if (!usuario) {
         return res.status(400).send("Credenciales invalidas");
       }
+
+      //obtener la playlist por id_usuario
+        const playlist = await obtenerPlaylistporIDUsuario(usuario.id_usuario);
+        if (!playlist) {
+            return res.status(400).send("Credenciales invalidas");
+        }
+
   
       const passwordValid = await bcrypt.compare(password, usuario.password);
       if (!passwordValid) {
         return res.status(400).send("Credenciales invalidas");
       }
-  
-      const token = jwt.sign({ id: usuario.id, email }, secret_key);
+
+      // generar el token con id_playlist del usuario
+      const token = jwt.sign({ id: usuario.id_usuario, email: usuario.email, id_playlist: playlist.id_playlist}, secret_key);
       delete usuario.password;
   
       res.status(200).send({ usuario, token });
@@ -132,7 +141,8 @@ app.post("/ingresos", async (req, res) => {
   });
   
 
-// private routes
+// ruta de agregar canciones con verificacion
 app.get("/agregarcanciones", (req, res) => {
-    res.render("AgregarCanciones", { requiereAuth: true });
+    //const id_usuario = req.usuario.id_usuario;
+    res.render("AgregarCanciones");
 });

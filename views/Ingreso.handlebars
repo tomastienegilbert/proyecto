@@ -30,6 +30,7 @@
       localStorage.setItem("usuario", JSON.stringify(data.usuario));
       localStorage.setItem("token", data.token);
       axios.defaults.headers.common['Authorization'] = localStorage.getItem("token");
+      console.log(data);
       window.location.href = '/agregarcanciones';
     } catch (e) {
       alert(e.response.data);
