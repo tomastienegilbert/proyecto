@@ -28,10 +28,12 @@
         password: password.value
       });
       localStorage.setItem("usuario", JSON.stringify(data.usuario));
+      //enviar datos de playlist a local storage
+      localStorage.setItem("playlist", JSON.stringify(data.playlist));
       localStorage.setItem("token", data.token);
       axios.defaults.headers.common['Authorization'] = localStorage.getItem("token");
       console.log(data);
-      window.location.href = '/agregarcanciones';
+      window.location.href = '/agregarcanciones/';
     } catch (e) {
       alert(e.response.data);
     }

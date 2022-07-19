@@ -14,6 +14,7 @@ const {
     nuevaPlaylist,
     obtenerPlaylists,
     obtenerPlaylistporIDUsuario,
+    obtenerPlaylistPorID,
     editarPlaylist,
     agregarCancion,
     obtenerCanciones,
@@ -63,7 +64,7 @@ app.get("/registro", (req, res) => {
     res.render("Registro");
 });
 
-// 1) registrar nuevo usuario con su playlist
+//registrar nuevo usuario con su playlist
 app.post("/usuarios", async (req, res) => {
     try {
     const { email, password, nombre, apellido, fecha_muerte, nombre_playlist } = req.body;
@@ -76,6 +77,34 @@ app.post("/usuarios", async (req, res) => {
     
     const playlist = await nuevaPlaylist({ nombre_playlist, id_usuario: usuario.id_usuario });
     res.send("/ingreso");
+    }
+    catch (e) {
+        res.status(500).send({
+            error: `Algo salió mal... ${e}`,
+            code: 500
+        })
+    }
+});
+
+//api de usuarios
+app.get("/usuarios", async (req, res) => {
+    try {
+        const usuarios = await obtenerUsuarios();
+        res.send(usuarios);
+    }
+    catch (e) {
+        res.status(500).send({
+            error: `Algo salió mal... ${e}`,
+            code: 500
+        })
+    }
+});
+
+//api de playlists
+app.get("/playlists", async (req, res) => {
+    try {
+        const playlists = await obtenerPlaylists();
+        res.send(playlists);
     }
     catch (e) {
         res.status(500).send({
@@ -121,7 +150,7 @@ app.post("/ingresos", async (req, res) => {
       //obtener la playlist por id_usuario
         const playlist = await obtenerPlaylistporIDUsuario(usuario.id_usuario);
         if (!playlist) {
-            return res.status(400).send("Credenciales invalidas");
+            return res.status(400).send("no se encuentra playlist");
         }
 
   
@@ -131,18 +160,32 @@ app.post("/ingresos", async (req, res) => {
       }
 
       // generar el token con id_playlist del usuario
-      const token = jwt.sign({ id: usuario.id_usuario, email: usuario.email, id_playlist: playlist.id_playlist}, secret_key);
+      const token = jwt.sign({ id: usuario.id_usuario, email: usuario.email, id_playlist: usuario.id_playlist}, secret_key);
       delete usuario.password;
   
-      res.status(200).send({ usuario, token });
+      res.status(200).send({ usuario, token, playlist });
     } catch (error) {
       res.status(500).send(error);
     }
   });
   
-
-// ruta de agregar canciones con verificacion
-app.get("/agregarcanciones", (req, res) => {
-    //const id_usuario = req.usuario.id_usuario;
+//renderizar vista agregarcanciones
+app.get("/agregarcanciones", async (req, res) => {
     res.render("AgregarCanciones");
+});
+
+//agregar canciones
+app.post("/canciones", async (req, res) => {
+    try {
+        const { titulo, album, artista, comentario, enlace } = req.body;
+        const { id_playlist } = req.playlist.id_playlist
+        const cancion = await agregarCancion({ titulo, album, artista, comentario, enlace, id_playlist });
+        res.send(cancion);
+    }
+    catch (e) {
+        res.status(500).send({
+            error: `Algo salió mal... ${e}`,
+            code: 500
+        })
+    }
 });

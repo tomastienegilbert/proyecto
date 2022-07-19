@@ -2,7 +2,7 @@
     <h2>Agrega canciones a tu playlist</h2>
     <hr class="w-50" />
   
-    <form action="/canciones" method="POST">
+    <form id="agregarCanciones">
         <div class="form-group row w-50 m-auto">
             <div class="form-group col-12 col-sm-6">
                 <label>Titulo</label>
@@ -36,9 +36,23 @@
     alert("Debes iniciar sesión para agregar canciones");
     window.location.replace("/ingreso");
   }
-  async function obtenerUsuarios() {
-    const { data } = axios.get('/usuarios');
-    console.log(data);
-  }
-  obtenerUsuarios();
+  // enviar datos de cancion con agregar canciones
+    document.getElementById("agregarCancion").addEventListener("click", async (event) => {
+        event.preventDefault();
+        let [titulo, album, artista, comentario, enlace] = document.querySelectorAll("input");
+        try {
+        const { data } = await axios.post('/canciones', {
+            titulo: titulo.value,
+            album: album.value,
+            artista: artista.value,
+            comentario: comentario.value,
+            enlace: enlace.value,
+            id_playlist: localStorage.getItem("playlist").id_playlist.value
+        });
+        console.log(data);
+        } catch (e) {
+        alert(e.response.data);
+        }
+    });
+
 </script>

@@ -41,16 +41,6 @@ const nuevaPlaylist = async ( { id_usuario, nombre_playlist } ) => {
   return result.rows[0]
 };
 
-//Editar usuario
-const editarUsuario = async (usuario) => {
-  const values = Object.values(usuario)
-  const result = await pool.query(
-    `UPDATE usuarios SET email = '$1', password = '$2', nombre = '$3', apellido = '$4', fecha_muerte = '$5' WHERE id = '$6' RETURNING *`
-    , values);
-  return result.rows[0];
-}
-
-
 //Obtener Playlists
 const obtenerPlaylists = async () => {
   const result = await pool.query(`SELECT * FROM playlists`);
@@ -66,6 +56,28 @@ const obtenerPlaylistporIDUsuario = async (id_usuario) => {
   return result.rows;
 }
 
+//obtener playlist por id
+const obtenerPlaylistPorID = async (id) => {
+  const result = await pool.query({
+    text: `SELECT * FROM playlists WHERE id_playlist = $1`,
+    values: [id_playlist]
+  })
+  return result.rows[0];
+}
+
+
+//Editar usuario
+const editarUsuario = async (usuario) => {
+  const values = Object.values(usuario)
+  const result = await pool.query(
+    `UPDATE usuarios SET email = '$1', password = '$2', nombre = '$3', apellido = '$4', fecha_muerte = '$5' WHERE id = '$6' RETURNING *`
+    , values);
+  return result.rows[0];
+}
+
+
+
+
 
 //Editar Playlist
 const editarPlaylist = async (playlist) => {
@@ -76,13 +88,13 @@ const editarPlaylist = async (playlist) => {
   return result.rows[0];
 }
 
-//Agregar canciones a una playlists
-const agregarCancion = async (playlist) => {
-  const values = Object.values(playlist)
-  const result = await pool.query(
-    `INSERT INTO canciones ( titulo, album, artista, comentario, enlace, id_playlist ) values ($1, $2, $3, $4, $5, $6) RETURNING *`
-    , values);
-  return result.rows[0];
+//Agregar canciones a una playlist
+const agregarCancion = async (titulo, album, artista, comentario, enlace, id_playlist) => {
+  const result = await pool.query({
+    text: `INSERT INTO canciones ( titulo, album, artista, comentario, enlace) WHERE id_playlist = $1 VALUES ( $2, $3, $4, $5, $6 ) RETURNING *`,
+    values: [ id_playlist, titulo, album, artista, comentario, enlace ]
+  })
+  return result.rows[0]
 }
 
 //Obtener Canciones
@@ -137,6 +149,7 @@ module.exports = {
   nuevaPlaylist,
   obtenerPlaylists,
   obtenerPlaylistporIDUsuario,
+  obtenerPlaylistPorID,
   editarPlaylist,
   agregarCancion,
   obtenerCanciones,
