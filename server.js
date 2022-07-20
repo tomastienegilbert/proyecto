@@ -178,7 +178,7 @@ app.get("/agregarcanciones", async (req, res) => {
 app.post("/canciones", async (req, res) => {
     try {
         const { titulo, album, artista, comentario, enlace } = req.body;
-        const { id_playlist } = req.playlist.id_playlist
+        const id_playlist = JSON.parse(localStorage.getItem("playlist")).id;
         const cancion = await agregarCancion({ titulo, album, artista, comentario, enlace, id_playlist });
         res.send(cancion);
     }
