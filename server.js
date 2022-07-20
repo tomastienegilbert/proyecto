@@ -33,6 +33,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(express.static(__dirname + "/public"));
 app.use("/css", express.static(__dirname + "/node_modules/bootstrap/dist/css"));
+//public favicon
+app.use("/favicon)", express.static(__dirname + "/public/favicon.ico"));
 app.use("/js", express.static(__dirname + "/node_modules/bootstrap/dist/js"));
 app.use(express.static(__dirname + "/node_modules/axios/dist"));
 
