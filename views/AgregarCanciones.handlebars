@@ -32,25 +32,38 @@
     </form>
  </div> 
 <script>
-  if (!localStorage.getItem("token")) {
+    //verificar token
+    const token = localStorage.getItem('token');
+  if (!token) {
     alert("Debes iniciar sesión para agregar canciones");
     window.location.replace("/ingreso");
   }
+
   // enviar datos de cancion con agregar canciones
+  const form = document.querySelector("form");
   document.querySelector("form").addEventListener("submit", async (e) => {
     e.preventDefault();
+
+    let [titulo, album, artista, comentario, enlace] = document.querySelectorAll("input");
+    titulo = titulo.value;
+    album = album.value;
+    artista = artista.value;
+    comentario = comentario.value;
+    enlace = enlace.value;
     try{
         const response = await axios.post('/canciones', {
-      titulo: document.querySelector("input[name='titulo']").value,
-      album: document.querySelector("input[name='album']").value,
-      artista: document.querySelector("input[name='artista']").value,
-      comentario: document.querySelector("input[name='comentario']").value,
-      enlace: document.querySelector("input[name='enlace']").value,
-      id_playlist: localStorage.getItem("playlist").id_playlist
-    });
-    window.location.href=response.data;
+            token,
+            titulo,
+            album,
+            artista,
+            comentario,
+            enlace
+        })
+    res.send(response);
+    alert("cancion agregada");
     }
     catch(e) {
+        console.log(e.response.data)
         alert(e.response.data)
     }
   });

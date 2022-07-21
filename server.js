@@ -33,8 +33,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(express.static(__dirname + "/public"));
 app.use("/css", express.static(__dirname + "/node_modules/bootstrap/dist/css"));
-//public favicon
-app.use("/favicon)", express.static(__dirname + "/public/favicon.ico"));
 app.use("/js", express.static(__dirname + "/node_modules/bootstrap/dist/js"));
 app.use(express.static(__dirname + "/node_modules/axios/dist"));
 
@@ -119,16 +117,16 @@ app.get("/playlists", async (req, res) => {
 //4. Implementar seguridad y restricción de recursos o contenido con JWT
 app.get("/perfil", (req, res) => {
     const { token } = req.query
-    jwt.verify(token, secretKey, (err, user) => {
-        // if (err) {
-        //     res.status(500).send({
-        //         error: `Algo salió mal...`,
-        //         message: err.message,
-        //         code: 500
-        //     })
-        // } else {
-            res.render("Perfil", { user });
-        // }
+    jwt.verify(token, secretKey, (err, usuario) => {
+        if (err) {
+            res.status(500).send({
+                error: `Algo salió mal...`,
+                message: err.message,
+                code: 500
+            })
+        } else {
+            res.render("Perfil", { usuario });
+        }
     })
 });
 
@@ -162,27 +160,32 @@ app.post("/ingresos", async (req, res) => {
       }
 
       // generar el token con id_playlist del usuario
-      const token = jwt.sign({ id: usuario.id_usuario, email: usuario.email, id_playlist: usuario.id_playlist}, secret_key);
-      delete usuario.password;
-  
-      res.status(200).send({ usuario, token, playlist });
+      const token = jwt.sign(playlist, secret_key);  
+      res.status(200).send({token})
     } catch (error) {
-      res.status(500).send(error);
+        console.log(e)
+        res.status(500).send({
+            error: `Algo salió mal... ${e}`,
+            code: 500
+        })
     }
   });
   
-//renderizar vista agregarcanciones
-app.get("/agregarcanciones", async (req, res) => {
+//renderizar vista agregarcanciones verificando token
+app.get("/agregarcanciones", (req, res) => {
     res.render("AgregarCanciones");
 });
 
 //agregar canciones
 app.post("/canciones", async (req, res) => {
     try {
-        const { titulo, album, artista, comentario, enlace } = req.body;
-        const id_playlist = JSON.parse(localStorage.getItem("playlist")).id;
-        const cancion = await agregarCancion({ titulo, album, artista, comentario, enlace, id_playlist });
-        res.send(cancion);
+        const { token, titulo, album, artista, comentario, enlace } = req.body;
+        const tokenDecodificado = jwt.verify(token, secret_key);
+        console.log(tokenDecodificado);
+        const id_playlist = tokenDecodificado.id_playlist;
+        console.log(id_playlist);
+        const cancion = await agregarCancion({ id_playlist, titulo, album, artista, comentario, enlace });
+        alert("Cancion agregada");
     }
     catch (e) {
         res.status(500).send({

@@ -53,7 +53,7 @@ const obtenerPlaylistporIDUsuario = async (id_usuario) => {
     text: `SELECT * FROM playlists WHERE id_usuario = $1`,
     values: [id_usuario]
   })
-  return result.rows;
+  return result.rows[0];
 }
 
 //obtener playlist por id
@@ -88,11 +88,11 @@ const editarPlaylist = async (playlist) => {
   return result.rows[0];
 }
 
-//Agregar canciones a una playlist
+//Agregar canciones a una playlist con determinnado id_playlist
 const agregarCancion = async (titulo, album, artista, comentario, enlace, id_playlist) => {
   const result = await pool.query({
-    text: `INSERT INTO canciones ( titulo, album, artista, comentario, enlace) WHERE id_playlist = $1 VALUES ( $2, $3, $4, $5, $6 ) RETURNING *`,
-    values: [ id_playlist, titulo, album, artista, comentario, enlace ]
+    text: `INSERT INTO canciones ( titulo, album, artista, comentario, enlace, id_playlist ) VALUES ( $1, $2, $3, $4, $5, $6 ) RETURNING *`,
+    values: [ titulo, album, artista, comentario, enlace, id_playlist ]
   })
   return result.rows[0]
 }
