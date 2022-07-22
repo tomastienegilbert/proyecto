@@ -107,11 +107,11 @@ const eliminarCancion = async (cancion) => {
 }
 
 //eliminar todas las canciones de una playlist
-const vaciarPlaylist = async (canciones) => {
-  const values = Object.values(canciones)
-  const result = await pool.query(
-    `DELETE FROM canciones WHERE id_playlist = $1 RETURNING *`
-    , values);
+const vaciarPlaylist = async (id_playlist) => {
+  const result = await pool.query({
+    text: `DELETE FROM canciones WHERE id_playlist = $1`,
+    values: [id_playlist]
+  })
   return result.rows[0];
 }
 

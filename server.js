@@ -116,18 +116,7 @@ app.get("/playlists", async (req, res) => {
 
 //4. Implementar seguridad y restricción de recursos o contenido con JWT
 app.get("/perfil", (req, res) => {
-    const { token } = req.query
-    jwt.verify(token, secretKey, (err, usuario) => {
-        if (err) {
-            res.status(500).send({
-                error: `Algo salió mal...`,
-                message: err.message,
-                code: 500
-            })
-        } else {
-            res.render("Perfil", { usuario });
-        }
-    })
+    res.render("Perfil");
 });
 
 app.get("/ingreso", (req, res) => {
@@ -219,15 +208,16 @@ app.get("/canciones", async (req, res) => {
     }
 })
 
-//api de canciones segun id de playlist
-app.get("/canciones/:id_playlist", async (req, res) => {
+//vaciar playlist
+app.delete("/canciones", async (req, res) => {
+    const {token} = req.query;
+    const id_playlist = JSON.stringify(jwt.verify(token, secret_key).id_playlist);
     try {
-        const canciones = await obtenerCancionesPorIDPlaylist(req.params.id_playlist);
-        res.send(canciones);
-    }
-    catch (e) {
+        const playlistEliminada = await vaciarPlaylist(id_playlist);
+        res.status(200).send(playlistEliminada);
+    } catch (error) {
         res.status(500).send({
-            error: `Algo salió mal... ${e}`,
+            error: `Algo salió mal... ${error}`,
             code: 500
         })
     }

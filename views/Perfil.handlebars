@@ -5,28 +5,20 @@
     <form>
         <div class="form-group row w-50 m-auto">
             <div class="form-group col-12 col-sm-6">
-                <label>Email</label>
-                <input name="email" class="form-control m-auto" disabled value="{{user.email}}" />
+                <label>Nuevo email</label>
+                <input name="email" class="form-control m-auto" />
             </div>
             <div class="form-group col-12 col-sm-6">
-                <label>Nombre</label>
-                <input name="nombre" class="form-control m-auto" value="{{user.nombre}}" />
+                <label>Nuevo nombre</label>
+                <input name="nombre" class="form-control m-auto" />
             </div>
             <div class="form-group col-12 col-sm-6">
                 <label>Password</label>
-                <input name="password" type="password" class="form-control m-auto" value="{{user.password}}" />
+                <input name="password" type="password" class="form-control m-auto"/>
             </div>
             <div class="form-group col-12 col-sm-6">
-                <label>Repita la password</label>
-                <input type="password" class="form-control m-auto" value="{{user.password}}" />
-            </div>
-            <div class="form-group col-12 col-sm-6">
-                <label>Años de experiencia</label>
-                <input name="años_experiencia" class="form-control m-auto" value="{{user.anos_experiencia}}" />
-            </div>
-            <div class="form-group col-12 col-sm-6">
-                <label>Especialidad</label>
-                <input name="especialidad" class="form-control m-auto" value="{{user.especialidad}}" />
+                <label>Confirme nuevo password</label>
+                <input type="password" class="form-control m-auto" />
             </div>
 
         </div>
@@ -40,48 +32,47 @@
 </div>
 
 <script>
-    const deleteBtn = document.getElementById("deleteBtn")
-
-    const id = `{{user .id}}`
-    deleteBtn.addEventListener("click", async () => {
-
-        try {
-            const { data: token } = await axios.delete(`/users/${id}`)
-            alert("Usuario eliminado con éxito")
-            window.location = `/`
-        } catch ({ response }) {
-            const { data } = response
-            const { error } = data
-            alert(error)
-        }
-    })
-
-    const form = document.querySelector("form")
-
-    form.addEventListener("submit", async (e) => {
-        e.preventDefault()
-
-        let [email, nombre, password, repassword, años_experiencia, especialidad] = document.querySelectorAll("input")
-
-        nombre = nombre.value
-        password = password.value
-        años_experiencia = años_experiencia.value
-        especialidad = especialidad.value
-        const skater = {
-            nombre,
-            password,
-            años_experiencia,
-            especialidad
-        }
-        try {
-            await axios.put("/skaters", skater)
-            alert("Datos actualizados con éxito")
-            window.location = "/login"
-        } catch ({ response }) {
-            const { data } = response
-            const { error } = data
-            alert(error)
-        }
-
-    })
+    //verificar token
+    const token = localStorage.getItem('token');
+    if (!token) {
+        alert("Debes iniciar sesión para configurar un perfil");
+        window.location.replace("/ingreso");
+    }
+    //const deleteBtn = document.getElementById("deleteBtn")
+    //const id = `{{user .id}}`
+    //deleteBtn.addEventListener("click", async () => {
+    //    try {
+    //        const { data: token } = await axios.delete(`/users/${id}`)
+    //        alert("Usuario eliminado con éxito")
+    //        window.location = `/`
+    //    } catch ({ response }) {
+    //        const { data } = response
+    //        const { error } = data
+    //        alert(error)
+    //    }
+    //})
+    //const form = document.querySelector("form")
+    //form.addEventListener("submit", async (e) => {
+    //    e.preventDefault()
+    //    let [email, nombre, password, repassword, años_experiencia, especialidad] = document.querySelectorAll("input")
+    //    nombre = nombre.value
+    //    password = password.value
+    //    años_experiencia = años_experiencia.value
+    //    especialidad = especialidad.value
+    //    const skater = {
+    //        nombre,
+    //        password,
+    //        años_experiencia,
+    //        especialidad
+    //    }
+    //    try {
+    //        await axios.put("/skaters", skater)
+    //        alert("Datos actualizados con éxito")
+    //        window.location = "/login"
+    //    } catch ({ response }) {
+    //        const { data } = response
+    //        const { error } = data
+    //        alert(error)
+    //    }
+    //})
 </script>

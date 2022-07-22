@@ -33,13 +33,15 @@
         <div class="container pt-5 w-75">
             <table class="table table-dark">
                 <thead>
-                <tr>
-                    {{!-- <th scope="col">#</th> --}}
-                    <th scope="col">Título</th>
-                    <th scope="col">Album</th>
-                    <th scope="col">Artista</th>
-                    <th scope="col">Comentario</th>
-                </tr>
+                    <tr>
+                        <th scope="col">Título</th>
+                        <th scope="col">Album</th>
+                        <th scope="col">Artista</th>
+                        <th scope="col">Comentario</th>
+                        <th scope="col"> </th>
+                        <th scope="col"> </th>
+                        <th scope="col"> </th>
+                    </tr>
                 </thead>
                 <tbody>
                 {{#each cancionesPlaylist}}
@@ -52,17 +54,18 @@
                 {{/each}}
                 </tbody>
             </table>
+            <hr>
         </div>
     </div>
  </div>
 <script>
-        //verificar token
+    //verificar token
     const token = localStorage.getItem('token');
-  if (!token) {
-    alert("Debes iniciar sesión para agregar canciones");
-    window.location.replace("/ingreso");
-  }
-  // enviar datos de cancion con agregar canciones
+    if (!token) {
+        alert("Debes iniciar sesión para agregar canciones");
+        window.location.replace("/ingreso");
+    }
+  // agregar canciones a la playlist
   const form = document.querySelector("form");
   document.querySelector("form").addEventListener("submit", async (e) => {
     e.preventDefault();
