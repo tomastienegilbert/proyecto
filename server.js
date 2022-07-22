@@ -84,6 +84,19 @@ app.post("/usuarios", async (req, res) => {
     }
 });
 
+app.get("/usuarios", async (req, res) => {
+    try {
+        const usuarios = await obtenerUsuarios();
+        res.send(usuarios);
+    } catch (e) {
+        res.status(500).send({
+            error: `Algo salió mal... ${e}`,
+            code: 500
+        })
+    }
+});
+
+
 //4. Implementar seguridad y restricción de recursos o contenido con JWT
 app.get("/perfil", (req, res) => {
     const { token } = req.query
