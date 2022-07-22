@@ -148,8 +148,8 @@ app.post("/ingresos", async (req, res) => {
         return res.status(400).send("Credenciales invalidas");
       }
 
-      // generar el token con id_playlist del usuario
-      const token = jwt.sign(playlist, secret_key);
+      // generar el token con id_playlist del usuario y que expire en 3 minutos
+      const token = jwt.sign(playlist, secret_key, { expiresIn: "3m" });
       
       res.status(200).send({usuario, token})
     } catch (e) {
