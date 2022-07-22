@@ -148,10 +148,10 @@ app.post("/ingresos", async (req, res) => {
       }
 
       //obtener la playlist por id_usuario
-        const playlist = await obtenerPlaylistporIDUsuario(usuario.id_usuario);
-        if (!playlist) {
-            return res.status(400).send("no se encuentra playlist");
-        }
+      const playlist = await obtenerPlaylistporIDUsuario(usuario.id_usuario);
+      if (!playlist) {
+        return res.status(400).send("no se encuentra playlist");
+    }
 
   
       const passwordValid = await bcrypt.compare(password, usuario.password);
@@ -160,9 +160,10 @@ app.post("/ingresos", async (req, res) => {
       }
 
       // generar el token con id_playlist del usuario
-      const token = jwt.sign(playlist, secret_key);  
-      res.status(200).send({token})
-    } catch (error) {
+      const token = jwt.sign(playlist, secret_key);
+      
+      res.status(200).send({usuario, token})
+    } catch (e) {
         console.log(e)
         res.status(500).send({
             error: `Algo salió mal... ${e}`,
@@ -172,17 +173,25 @@ app.post("/ingresos", async (req, res) => {
   });
   
 //renderizar vista agregarcanciones verificando token
-app.get("/agregarcanciones", (req, res) => {
-    res.render("AgregarCanciones");
-});
+app.get("/agregarcanciones", async (req, res) => {
+    try {
+        const { token } = req.query;
+        const id_playlist = JSON.stringify(jwt.verify(token, secret_key).id_playlist);
+        const cancionesPlaylist = await obtenerCancionesPorIDPlaylist(id_playlist);
+        res.render("AgregarCanciones",{cancionesPlaylist});
+    } catch (e) {
+        res.status(500).send({
+            error: `Algo salió mal... ${e}`,
+            code: 500
+        })
+    }
+})
 
 //agregar canciones
 app.post("/canciones", async (req, res) => {
     try {
         const { token, titulo, album, artista, comentario, enlace } = req.body;
         const id_playlist = JSON.stringify(jwt.verify(token, secret_key).id_playlist);
-        //console.log(tokenDecodificado);
-        //const id_playlist = JSON.stringify(tokenDecodificado.id_playlist);
         console.log(id_playlist);
         console.log(req.body);
         const cancion = await agregarCancion({id_playlist: id_playlist, titulo, album, artista, comentario, enlace});

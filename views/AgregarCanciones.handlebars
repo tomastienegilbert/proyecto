@@ -29,40 +29,45 @@
     </form>
     <hr>
     <div id="ListaCanciones">
-        <h2>Playlist &#127908;</h2>
+        <h2>Tu Playlist</h2>
         <div class="container pt-5 w-75">
-        <table class="table table-dark">
-            <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Título</th>
-                <th scope="col">Album</th>
-                <th scope="col">Artista</th>
-                <th scope="col">Comentario</th>
-                <th scope="col"> </th>
-                <th scope="col"> </th>
-            </tr>
-            </thead>
-            <tbody id="cuerpo"></tbody>
-        </table>
+            <table class="table table-dark">
+                <thead>
+                <tr>
+                    {{!-- <th scope="col">#</th> --}}
+                    <th scope="col">Título</th>
+                    <th scope="col">Album</th>
+                    <th scope="col">Artista</th>
+                    <th scope="col">Comentario</th>
+                </tr>
+                </thead>
+                <tbody>
+                {{#each cancionesPlaylist}}
+                <tr>
+                    <td>{{this.titulo}}</td>
+                    <td>{{this.album}}</td>
+                    <td>{{this.artista}}</td>
+                    <td>{{this.comentario}}</td>
+                </tr>
+                {{/each}}
+                </tbody>
+            </table>
         </div>
-  </div>
+    </div>
  </div>
 <script>
-    //verificar token
+        //verificar token
     const token = localStorage.getItem('token');
   if (!token) {
     alert("Debes iniciar sesión para agregar canciones");
     window.location.replace("/ingreso");
   }
-
   // enviar datos de cancion con agregar canciones
   const form = document.querySelector("form");
   document.querySelector("form").addEventListener("submit", async (e) => {
     e.preventDefault();
     try{
         const response = await axios.post('/canciones', {
-
             token,
             titulo: document.querySelector("input[name='titulo']").value,
             album: document.querySelector("input[name='album']").value,
@@ -72,51 +77,12 @@
         });
         console.log(response.data);
         alert("Cancion agregada");
+        //actualizare la pagina
+        window.location.reload();
     }
     catch(e) {
         console.log(e.response.data)
         alert(e.response.data)
     }
   });
-
-  // obtener canciones de la playlist
-  let tbody = document.getElementById("cuerpo");
-  let titulo = document.getElementById("cancion");
-  let album = document.getElementById("artista");
-  let artista = document.getElementById("tono");
-  let comentario = document.getElementById("comentario");
-  let enlace = document.getElementById("enlace");
-
-  let canciones = [];
-  window.onload = getData();
-
-  async function obtenerCancionesPorIDPlayits() {
-    await axios.get(/canciones/:id_playlist).then((data) => {
-        const { id_playlist } = req.params;
-        canciones = data.data;
-        tbody.innerHTML = "";
-        console.log(canciones)
-        canciones.forEach((c, i) => {
-            tbody.innerHTML += `
-                                <tr>
-                                    <td>${i + 1}</td>
-                                    <td>${c.titulo}</td>
-                                    <td>${c.album}</td>
-                                    <td>${c.artista}</td>
-                                    <td>${c.comentario}</td>
-                                    <td><button class="btn btn-warning" onclick="reproducirCancion(${i},'${c.id}')">Reproducir</button></td>
-                                    <td><button class="btn btn-warning" onclick="editarCancion(${i},'${c.id}')">Editar</button></td>
-                                    <td><button class="btn btn-danger" onclick="eliminarCancion(${i},'${c.id}')">Eliminar</button></td>
-                                </tr>
-            `;
-        });
-    });
-    titulo.value = "";
-    album.value = "";
-    artista.value = "";
-    comentario.value = "";
-    enlace.value = "";
-  }
-
-
 </script>

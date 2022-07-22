@@ -29,9 +29,9 @@
       });
       //enviar datos de playlist a local storage en el token
       localStorage.setItem("token", data.token);
-      //axios.defaults.headers.common['Authorization'] = localStorage.getItem("token");
+      //enviar token a servidor para que lo valide
       console.log(data);
-      window.location.href = '/agregarcanciones/';
+      window.location.href = `/agregarcanciones?token=${data.token}`;
     } catch (e) {
       alert(e.response.data);
     }

@@ -1,3 +1,12 @@
+--borrar tabla canciones
+DROP TABLE canciones;
+
+--borrar tabla playlists
+DROP TABLE playlists;
+
+--borrar tabla usuarios
+DROP TABLE usuarios;
+
 --Usuarios
 CREATE TABLE usuarios (
   id_usuario SERIAL PRIMARY KEY,
@@ -28,7 +37,3 @@ CREATE TABLE canciones (
   id_playlist INTEGER NOT NULL,
   FOREIGN KEY (id_playlist) REFERENCES playlists(id_playlist)
 );
-
-SELECT * FROM usuarios;
-SELECT * FROM playlists;
-SELECT * FROM canciones;
