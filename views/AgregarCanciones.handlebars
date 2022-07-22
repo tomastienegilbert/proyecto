@@ -2,43 +2,121 @@
     <h2>Agrega canciones a tu playlist</h2>
     <hr class="w-50" />
   
-    <form action="/canciones" method="POST">
+    <form>
         <div class="form-group row w-50 m-auto">
             <div class="form-group col-12 col-sm-6">
                 <label>Titulo</label>
-                <input name="titulo" class="form-control m-auto" />
+                <input value="ejemplo1" name="titulo" class="form-control m-auto" />
             </div>
             <div class="form-group col-12 col-sm-6">
                 <label>Álbum</label>
-                <input name="album" class="form-control m-auto" />
+                <input value="ejemplo1" name="album" class="form-control m-auto" />
             </div>
             <div class="form-group col-12 col-sm-6">
                 <label>Artista</label>
-                <input name="artista" class="form-control m-auto" />
+                <input value="ejemplo1" name="artista" class="form-control m-auto" />
             </div>
             <div class="form-group col-12 col-sm-6">
                 <label>Comentario</label>
-                <input name="comentario" class="form-control m-auto" />
+                <input value="ejemplo1" name="comentario" class="form-control m-auto" />
             </div>
             <div class="form-group col-12">
                 <label>Enlace</label>
-                <input name="enlace" class="form-control m-auto" />
+                <input value="ejemplo1" name="enlace" class="form-control m-auto" />
             </div>
-  
         </div>
-        <div class="mb-1">
-            <button class="btn btn-primary" id="agregarCancion">Agregar Canción</button>
-        </div>
+            <button type="submit" class="mb-1 btn btn-primary" id="agregarCancion">Agregar Canción</button>
     </form>
- </div> 
+    <hr>
+    <div id="ListaCanciones">
+        <h2>Playlist &#127908;</h2>
+        <div class="container pt-5 w-75">
+        <table class="table table-dark">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Título</th>
+                <th scope="col">Album</th>
+                <th scope="col">Artista</th>
+                <th scope="col">Comentario</th>
+                <th scope="col"> </th>
+                <th scope="col"> </th>
+            </tr>
+            </thead>
+            <tbody id="cuerpo"></tbody>
+        </table>
+        </div>
+  </div>
+ </div>
 <script>
-  if (!localStorage.getItem("token")) {
+    //verificar token
+    const token = localStorage.getItem('token');
+  if (!token) {
     alert("Debes iniciar sesión para agregar canciones");
     window.location.replace("/ingreso");
   }
-  async function obtenerUsuarios() {
-    const { data } = axios.get('/usuarios');
-    console.log(data);
+
+  // enviar datos de cancion con agregar canciones
+  const form = document.querySelector("form");
+  document.querySelector("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    try{
+        const response = await axios.post('/canciones', {
+
+            token,
+            titulo: document.querySelector("input[name='titulo']").value,
+            album: document.querySelector("input[name='album']").value,
+            artista: document.querySelector("input[name='artista']").value,
+            comentario: document.querySelector("input[name='comentario']").value,
+            enlace: document.querySelector("input[name='enlace']").value
+        });
+        console.log(response.data);
+        alert("Cancion agregada");
+    }
+    catch(e) {
+        console.log(e.response.data)
+        alert(e.response.data)
+    }
+  });
+
+  // obtener canciones de la playlist
+  let tbody = document.getElementById("cuerpo");
+  let titulo = document.getElementById("cancion");
+  let album = document.getElementById("artista");
+  let artista = document.getElementById("tono");
+  let comentario = document.getElementById("comentario");
+  let enlace = document.getElementById("enlace");
+
+  let canciones = [];
+  window.onload = getData();
+
+  async function obtenerCancionesPorIDPlayits() {
+    await axios.get(/canciones/:id_playlist).then((data) => {
+        const { id_playlist } = req.params;
+        canciones = data.data;
+        tbody.innerHTML = "";
+        console.log(canciones)
+        canciones.forEach((c, i) => {
+            tbody.innerHTML += `
+                                <tr>
+                                    <td>${i + 1}</td>
+                                    <td>${c.titulo}</td>
+                                    <td>${c.album}</td>
+                                    <td>${c.artista}</td>
+                                    <td>${c.comentario}</td>
+                                    <td><button class="btn btn-warning" onclick="reproducirCancion(${i},'${c.id}')">Reproducir</button></td>
+                                    <td><button class="btn btn-warning" onclick="editarCancion(${i},'${c.id}')">Editar</button></td>
+                                    <td><button class="btn btn-danger" onclick="eliminarCancion(${i},'${c.id}')">Eliminar</button></td>
+                                </tr>
+            `;
+        });
+    });
+    titulo.value = "";
+    album.value = "";
+    artista.value = "";
+    comentario.value = "";
+    enlace.value = "";
   }
-  obtenerUsuarios();
+
+
 </script>

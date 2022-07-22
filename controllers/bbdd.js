@@ -41,6 +41,25 @@ const nuevaPlaylist = async ( { id_usuario, nombre_playlist } ) => {
   return result.rows[0]
 };
 
+//obtener playlist por id de usuario
+const obtenerPlaylistporIDUsuario = async (id_usuario) => {
+  const result = await pool.query({
+    text: `SELECT * FROM playlists WHERE id_usuario = $1`,
+    values: [id_usuario]
+  })
+  return result.rows[0];
+}
+
+//obtener playlist por id
+const obtenerPlaylistPorID = async (id) => {
+  const result = await pool.query({
+    text: `SELECT * FROM playlists WHERE id_playlist = $1`,
+    values: [id_playlist]
+  })
+  return result.rows[0];
+}
+
+
 //Editar usuario
 const editarUsuario = async (usuario) => {
   const values = Object.values(usuario)
@@ -51,11 +70,8 @@ const editarUsuario = async (usuario) => {
 }
 
 
-//Obtener Playlists
-const obtenerPlaylists = async () => {
-  const result = await pool.query(`SELECT * FROM playlists`);
-  return result.rows;
-}
+
+
 
 //Editar Playlist
 const editarPlaylist = async (playlist) => {
@@ -66,13 +82,13 @@ const editarPlaylist = async (playlist) => {
   return result.rows[0];
 }
 
-//Agregar canciones a una playlists
-const agregarCancion = async (playlist) => {
-  const values = Object.values(playlist)
-  const result = await pool.query(
-    `INSERT INTO canciones ( titulo, album, artista, comentario, enlace, id_playlist ) values ($1, $2, $3, $4, $5, $6) RETURNING *`
-    , values);
-  return result.rows[0];
+//Agregar canciones a una playlist con determinnado id_playlist
+const agregarCancion = async ({titulo, album, artista, comentario, enlace, id_playlist}) => {
+  const result = await pool.query({
+    text: `INSERT INTO canciones ( titulo, album, artista, comentario, enlace, id_playlist ) VALUES ( $1, $2, $3, $4, $5, $6 ) RETURNING *`,
+    values: [ titulo, album, artista, comentario, enlace, id_playlist ]
+  })
+  return result.rows[0]
 }
 
 //Obtener Canciones
@@ -108,12 +124,12 @@ const editarCancion = async (cancion) => {
   return result.rows[0];
 }
 
-//Obtener playlist de un usuario
-const playlistUsuario = async (canciones) => {
-  const values = Object.values(canciones)
-  const result = await pool.query(
-    `SELECT * FROM canciones WHERE id_playlist = $1`
-    , values);
+//Obtener playlist de determinada playlist
+const obtenerCancionesPorIDPlaylist = async (id_playlist) => {
+  const result = await pool.query({
+    text: `SELECT * FROM canciones WHERE id_playlist = $1`,
+    values: [id_playlist]
+  })
   return result.rows;
 }
 
@@ -121,16 +137,14 @@ const playlistUsuario = async (canciones) => {
 
 module.exports = {
   nuevoUsuario,
-  obtenerUsuarios,
   obtenerUsuarioPorEmail,
   editarUsuario,
   nuevaPlaylist,
-  obtenerPlaylists,
+  obtenerPlaylistporIDUsuario,
   editarPlaylist,
   agregarCancion,
-  obtenerCanciones,
+  obtenerCancionesPorIDPlaylist,
+  editarCancion,
   eliminarCancion,
   vaciarPlaylist,
-  editarCancion,
-  playlistUsuario
 }

@@ -6,11 +6,11 @@
     <div class="form-group">
       <div class="form-group">
         <label>Email</label>
-        <input id="email" type="email" value="ejemplo1@mail.com" name="email" class="form-control w-50 m-auto" />
+        <input id="email" type="email" value="primer@ejemplo.com" name="email" class="form-control w-50 m-auto" />
       </div>
       <div class="form-group">
         <label>Password</label>
-        <input id="password" name="password" type="password" value="encriptado1" class="form-control w-50 m-auto" />
+        <input id="password" name="password" type="password" value="encriptada1" class="form-control w-50 m-auto" />
       </div>
     </div>
     <button type="submit" class="btn btn-primary m-1" id="ingresoUsuario">Ingresa</button>
@@ -27,10 +27,11 @@
         email: email.value,
         password: password.value
       });
-      localStorage.setItem("usuario", JSON.stringify(data.usuario));
+      //enviar datos de playlist a local storage en el token
       localStorage.setItem("token", data.token);
-      axios.defaults.headers.common['Authorization'] = localStorage.getItem("token");
-      window.location.href = '/agregarcanciones';
+      //axios.defaults.headers.common['Authorization'] = localStorage.getItem("token");
+      console.log(data);
+      window.location.href = '/agregarcanciones/';
     } catch (e) {
       alert(e.response.data);
     }
