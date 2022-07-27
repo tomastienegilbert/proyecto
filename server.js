@@ -222,3 +222,18 @@ app.delete("/canciones/:id_cancion", async (req, res) => {
         })
     }
 });
+
+//eliminar todas las canciones de una playlist
+app.delete("/canciones/:id_playlist", async (req, res) => {
+    const { id_playlist } = req.params;
+    try {
+        await vaciarPlaylist(id_playlist);
+        res.status(200).send("Canciones eliminadas");
+    }
+    catch (e) {
+        res.status(500).send({
+            error: `Algo salió mal... ${e}`,
+            code: 500
+        })
+    }
+});
