@@ -148,8 +148,8 @@ app.post("/ingresos", async (req, res) => {
         return res.status(400).send("Credenciales invalidas");
       }
 
-      // generar el token con id_playlist del usuario y que expire en 3 minutos
-      const token = jwt.sign(playlist, secret_key, { expiresIn: "3m" });
+      // generar el token con id_playlist y usuario
+        const token = jwt.sign({ id_playlist: playlist.id_playlist, id_usuario: usuario.id_usuario }, secret_key);
       
       res.status(200).send({usuario, token})
     } catch (e) {
@@ -165,7 +165,7 @@ app.post("/ingresos", async (req, res) => {
 app.get("/agregarcanciones", async (req, res) => {
     try {
         const { token } = req.query;
-        const id_playlist = JSON.stringify(jwt.verify(token, secret_key).id_playlist);
+        const id_playlist = await JSON.stringify(jwt.verify(token, secret_key).id_playlist);
         const cancionesPlaylist = await obtenerCancionesPorIDPlaylist(id_playlist);
         res.render("AgregarCanciones",{cancionesPlaylist});
     } catch (e) {
@@ -208,16 +208,16 @@ app.get("/canciones", async (req, res) => {
     }
 })
 
-//vaciar playlist
-app.delete("/canciones", async (req, res) => {
-    const {token} = req.query;
-    const id_playlist = JSON.stringify(jwt.verify(token, secret_key).id_playlist);
+//eliminar canciones
+app.delete("/canciones/:id_cancion", async (req, res) => {
+    const { id_cancion } = req.params;
     try {
-        const playlistEliminada = await vaciarPlaylist(id_playlist);
-        res.status(200).send(playlistEliminada);
-    } catch (error) {
+        await eliminarCancion(id_cancion);
+        res.status(200).send("Cancion eliminada");
+    }
+    catch (e) {
         res.status(500).send({
-            error: `Algo salió mal... ${error}`,
+            error: `Algo salió mal... ${e}`,
             code: 500
         })
     }

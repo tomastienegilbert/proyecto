@@ -22,16 +22,22 @@
     document.getElementById("formIngreso").addEventListener("submit", async (event) => {
     event.preventDefault();
     let [email, password] = document.querySelectorAll("input");
+    
     try {
       const { data } = await axios.post('/ingresos', {
         email: email.value,
         password: password.value
       });
+
       //enviar datos de playlist a local storage en el token
       localStorage.setItem("token", data.token);
+
       //enviar token a servidor para que lo valide
       console.log(data);
-      window.location.href = `/agregarcanciones?token=${data.token}`;
+
+      //redireccionar a vista de agregar canciones con parametro de playlist
+      window.location.replace("/agregarCanciones?token=" + data.token);
+
     } catch (e) {
       alert(e.response.data);
     }

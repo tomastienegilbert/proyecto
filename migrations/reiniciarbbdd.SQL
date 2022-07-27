@@ -26,6 +26,9 @@ CREATE TABLE playlists (
   fecha_creacion TIMESTAMP
 );
 
+--borrar tabla canciones
+DROP TABLE canciones;
+
 --Tabla Canciónes de cada usuario
 CREATE TABLE canciones (
   id_cancion SERIAL PRIMARY KEY,

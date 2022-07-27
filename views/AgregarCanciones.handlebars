@@ -50,15 +50,16 @@
                     <td>{{this.album}}</td>
                     <td>{{this.artista}}</td>
                     <td>{{this.comentario}}</td>
-                    <td><button class="btn-success">Reproducir</button></td>
-                    <td><button class="btn-warning">Editar</button></td>
-                    <td><button class="btn-danger">Eliminar</button></td>
+                    <td><button class="btn btn-success" onclick="reproducirCancion({{this.id_cancion}}, this)">Reproducir</button></td>
+                    <td><button class="btn btn-warning" onclick="editarCancion({{this.id_cancion}}, this)">Editar</button></td>
+                    <td><button class="btn btn-danger" onclick="eliminarCancion({{this.id_cancion}}, this)">Eliminar</button></td>
                 </tr>
                 {{/each}}
                 </tbody>
             </table>
             <hr>
-            <button class="btn-danger">Vaciar Playlist</button>
+            {{!-- boton para vaciar playlist activando funcion vaciarPlaylist(id_playlist) --}}
+            <button class="btn btn-danger" onclick="vaciarPlaylist({{id_playlist}})">Vaciar Playlist</button>
         </div>
     </div>
  </div>
@@ -69,6 +70,7 @@
         alert("Debes iniciar sesión para agregar canciones");
         window.location.replace("/ingreso");
     }
+
   // agregar canciones a la playlist
   const form = document.querySelector("form");
   document.querySelector("form").addEventListener("submit", async (e) => {
@@ -92,4 +94,21 @@
         alert(e.response.data)
     }
   });
+
+  //eliminar canciones de la playlist
+    const eliminarCancion = async (id_cancion) => {
+        try{
+            const response = await axios.delete(`canciones/${id_cancion}`, {
+                id_cancion
+            });
+            console.log(response.data);
+            alert("Cancion eliminada");
+            //actualizare la pagina
+            window.location.reload();
+        }
+        catch(e) {
+            console.log(e.response.data)
+            alert(e.response.data)
+        }
+    };
 </script>

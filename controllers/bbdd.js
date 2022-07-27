@@ -101,7 +101,7 @@ const obtenerCanciones = async () => {
 const eliminarCancion = async (cancion) => {
   const values = Object.values(cancion)
   const result = await pool.query(
-    `DELETE FROM canciones WHERE id = $1 RETURNING *`
+    `DELETE FROM canciones WHERE id_cancion = $1 RETURNING *`
     , values);
   return result.rows[0];
 }
