@@ -51,7 +51,7 @@ const obtenerPlaylistporIDUsuario = async (id_usuario) => {
 }
 
 //obtener playlist por id
-const obtenerPlaylistPorID = async (id) => {
+const obtenerPlaylistPorID = async (id_playlist) => {
   const result = await pool.query({
     text: `SELECT * FROM playlists WHERE id_playlist = $1`,
     values: [id_playlist]
@@ -108,19 +108,21 @@ const eliminarCancion = async (cancion) => {
 
 //eliminar todas las canciones de una playlist
 const vaciarPlaylist = async (id_playlist) => {
+ const values = Object.values(id_playlist)
   const result = await pool.query({
-    text: `DELETE FROM canciones WHERE id_playlist = $1`,
+    text: `DELETE FROM canciones WHERE id_playlist = $1 RETURNING *`,
     values: [id_playlist]
   })
   return result.rows[0];
 }
 
 //editar cancion
-const editarCancion = async (cancion) => {
-  const values = Object.values(cancion)
-  const result = await pool.query(
-    `UPDATE canciones SET titulo = $1, album = $2, artista = $3, comentario = $4, enlace = $5 WHERE id = $6 RETURNING *`
-    , values);
+const actualizarCancion = async ({titulo, album, artista, comentario, enlace}, id_cancion) => {
+  const values = Object.values({titulo, album, artista, comentario, enlace}, id_cancion)
+  const result = await pool.query({
+    text: `UPDATE canciones SET titulo = $1, album = $2, artista = $3, comentario = $4, enlace = $5 WHERE id_cancion = $6 RETURNING *`,
+    values: [ titulo, album, artista, comentario, enlace, id_cancion ]
+  })
   return result.rows[0];
 }
 
@@ -141,10 +143,11 @@ module.exports = {
   editarUsuario,
   nuevaPlaylist,
   obtenerPlaylistporIDUsuario,
+  obtenerPlaylistPorID,
   editarPlaylist,
   agregarCancion,
   obtenerCancionesPorIDPlaylist,
-  editarCancion,
+  actualizarCancion,
   eliminarCancion,
   vaciarPlaylist,
 }

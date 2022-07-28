@@ -19,6 +19,8 @@
 </div>
 
 <script>
+  //borrar local storage
+  localStorage.clear();
     document.getElementById("formIngreso").addEventListener("submit", async (event) => {
     event.preventDefault();
     let [email, password] = document.querySelectorAll("input");
@@ -31,12 +33,17 @@
 
       //enviar datos de playlist a local storage en el token
       localStorage.setItem("token", data.token);
+      localStorage.setItem("datos playlist", JSON.stringify(data.playlist));
+      localStorage.setItem("datos usuario", JSON.stringify(data.usuario));
+
+      //tomar id_playlist de data
+      const id_playlist = data.playlist.id_playlist;
 
       //enviar token a servidor para que lo valide
       console.log(data);
 
       //redireccionar a vista de agregar canciones con parametro de playlist
-      window.location.replace("/agregarCanciones?token=" + data.token);
+      window.location.replace(`/agregarCanciones/?token=${data.token}`);
 
     } catch (e) {
       alert(e.response.data);

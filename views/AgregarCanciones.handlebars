@@ -6,19 +6,19 @@
         <div class="form-group row w-50 m-auto">
             <div class="form-group col-12 col-sm-6">
                 <label>Titulo</label>
-                <input value="ejemplo1" name="titulo" class="form-control m-auto" />
+                <input value="Gitana (Remix)" name="titulo" class="form-control m-auto" />
             </div>
             <div class="form-group col-12 col-sm-6">
                 <label>Álbum</label>
-                <input value="ejemplo1" name="album" class="form-control m-auto" />
+                <input value="Vasos vacíos" name="album" class="form-control m-auto" />
             </div>
             <div class="form-group col-12 col-sm-6">
                 <label>Artista</label>
-                <input value="ejemplo1" name="artista" class="form-control m-auto" />
+                <input value="Los fabulosos cadillacs" name="artista" class="form-control m-auto" />
             </div>
             <div class="form-group col-12 col-sm-6">
                 <label>Comentario</label>
-                <input value="ejemplo1" name="comentario" class="form-control m-auto" />
+                <input type="text-area" value="Bailar mucho!" name="comentario" class="form-control m-auto" />
             </div>
             <div class="form-group col-12">
                 <label>Enlace</label>
@@ -27,6 +27,7 @@
         </div>
             <button type="submit" class="mb-1 btn btn-primary" id="agregarCancion">Agregar Canción</button>
     </form>
+            <button class="m-auto btn btn-warning" id="aplicarCambios" style="display:none;">Aplicar Cambios</button>
     <hr>
     <div id="ListaCanciones">
         <h2>Tu Playlist</h2>
@@ -46,24 +47,25 @@
                 <tbody>
                 {{#each cancionesPlaylist}}
                 <tr>
-                    <td>{{this.titulo}}</td>
-                    <td>{{this.album}}</td>
-                    <td>{{this.artista}}</td>
-                    <td>{{this.comentario}}</td>
-                    <td><a href="{{this.enlace}}, this" target="_blank"><button class="btn btn-success">Reproducir</button></a></td>
-                    <td><button class="btn btn-warning" onclick="editarCancion({{this.id_cancion}}, this)">Editar</button></td>
-                    <td><button class="btn btn-danger" onclick="eliminarCancion({{this.id_cancion}}, this)">Eliminar</button></td>
+                    <td class="tituloCancionIngresada">{{this.titulo}}</td>
+                    <td class="albumCancionIngresada">{{this.album}}</td>
+                    <td class="artistaCancionIngresada">{{this.artista}}</td>
+                    <td class="comentarioCancionIngresada">{{this.comentario}}</td>
+                    <td class="enlaceCancionIngresada"><a href="{{this.enlace}}, this" target="_blank"><button class="btn btn-success">Reproducir</button></a></td>
+                    <td class="editarCancionIngresada"><button class="btn btn-warning" onclick="editarCancion({{this.id_cancion}})">Editar</button></td>
+                    <td class="eliminarCancionIngresada"><button class="btn btn-danger" onclick="eliminarCancion({{this.id_cancion}})">Eliminar</button></td>
                 </tr>
                 {{/each}}
                 </tbody>
             </table>
             <hr>
             {{!-- boton para vaciar playlist activando funcion vaciarPlaylist(id_playlist) --}}
-            <button class="btn btn-danger" onclick="vaciarPlaylist(this.id_playlist, this)">Vaciar Playlist</button>
+            <button class="btn btn-danger" onclick="vaciarPlaylist(id_playlist)">Vaciar Playlist</button>
         </div>
     </div>
  </div>
 <script>
+
     //verificar token
     const token = localStorage.getItem('token');
     if (!token) {
@@ -71,9 +73,13 @@
         window.location.replace("/ingreso");
     }
 
-  // agregar canciones a la playlist
-  const form = document.querySelector("form");
-  document.querySelector("form").addEventListener("submit", async (e) => {
+    //delcarar id playlist
+    var id_playlist = JSON.parse(localStorage.getItem('datos playlist')).id_playlist;
+    console.log(`la playlist es: ${id_playlist}`);
+
+    // agregar canciones a la playlist
+    const form = document.querySelector("form");
+    document.querySelector("form").addEventListener("submit", async (e) => {
     e.preventDefault();
     try{
         const response = await axios.post('/canciones', {
@@ -93,16 +99,71 @@
         console.log(e.response.data)
         alert(e.response.data)
     }
-  });
+    });
+
+    //reproducir cancion redirigiendo a enlace de cancion
+    const reproducirCancion = async (enlace) => {
+        window.location.replace(enlace);
+    };
+
+    //editar canciones de la playlist
+    const editarCancion = async (id_cancion) => {
+        document.querySelector("h2").innerHTML = "Editar Canción";
+        document.querySelector("h2").style.color = "yellow";
+        document.querySelector("input[name='titulo']").value = "Cambio";
+        document.querySelector("input[name='album']").value = "Cambio";
+        document.querySelector("input[name='artista']").value = "Cambio";
+        document.querySelector("input[name='comentario']").value = "Cambio";
+        document.querySelector("input[name='enlace']").value = "Cambio";
+        document.getElementById("agregarCancion").style.display = "none";
+        document.getElementById("aplicarCambios").setAttribute("onclick", `aplicarCambios(${id_cancion})`);
+        document.getElementById("aplicarCambios").style.display = "block";
+    }
+
+    //aplicar cambios a la cancion
+    const aplicarCambios = async (id_cancion) => {
+        try{
+            const response = await axios.put(`/canciones/${id_cancion}`, {
+                titulo: document.querySelector("input[name='titulo']").value,
+                album: document.querySelector("input[name='album']").value,
+                artista: document.querySelector("input[name='artista']").value,
+                comentario: document.querySelector("input[name='comentario']").value,
+                enlace: document.querySelector("input[name='enlace']").value
+            });
+            console.log(`nuevos valores: ${response.data}`);
+            alert("Cancion editada");
+            
+            //actualizar tabla
+            window.location.reload();
+        }
+        catch(e) {
+            console.log(e.response.data)
+            alert(e.response.data)
+        }
+    }
 
   //eliminar canciones de la playlist
     const eliminarCancion = async (id_cancion) => {
         try{
-            const response = await axios.delete(`canciones/${id_cancion}`, {
-                id_cancion
-            });
+            const response = await axios.delete(`/canciones/${id_cancion}`);
             console.log(response.data);
             alert("Cancion eliminada");
+            //actualizar tabla
+            window.location.reload();
+        }
+        catch(e) {
+            console.log(e.response.data)
+            alert(e.response.data)
+        }
+    }
+
+    //vaciar playlist
+    const vaciarPlaylist = async (id_playlist) => {
+        id_playlist = JSON.parse(localStorage.getItem('datos playlist')).id_playlist;
+        try{
+            const response = await axios.delete(`/playlists/${id_playlist}`);
+            console.log(response.data);
+            alert("Playlist vaciada");
             //actualizare la pagina
             window.location.reload();
         }
@@ -110,11 +171,6 @@
             console.log(e.response.data)
             alert(e.response.data)
         }
-    };
-
-    //reproducir cancion redirigiendo a enlace de cancion
-    const reproducirCancion = async (enlace) => {
-        window.location.replace(enlace);
-    };
+    }
 
 </script>

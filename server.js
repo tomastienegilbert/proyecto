@@ -14,11 +14,12 @@ const {
     nuevaPlaylist,
     obtenerPlaylists,
     obtenerPlaylistporIDUsuario,
+    obtenerPlaylistPorID,
     editarPlaylist,
     agregarCancion,
     obtenerCanciones,
     obtenerCancionesPorIDPlaylist,
-    editarCancion,
+    actualizarCancion,
     eliminarCancion,
     vaciarPlaylist,
 } = require("./controllers/bbdd.js");
@@ -151,7 +152,13 @@ app.post("/ingresos", async (req, res) => {
       // generar el token con id_playlist y usuario
         const token = jwt.sign({ id_playlist: playlist.id_playlist, id_usuario: usuario.id_usuario }, secret_key);
       
-      res.status(200).send({usuario, token})
+        //res con toke, id_playlist, id_usuario e id_playlist borranro la password del usuario
+        res.send({
+            token,
+            usuario,
+            playlist
+        });
+        delete usuario.password;
     } catch (e) {
         console.log(e)
         res.status(500).send({
@@ -167,6 +174,7 @@ app.get("/agregarcanciones", async (req, res) => {
         const { token } = req.query;
         const id_playlist = await JSON.stringify(jwt.verify(token, secret_key).id_playlist);
         const cancionesPlaylist = await obtenerCancionesPorIDPlaylist(id_playlist);
+        const playlist = await obtenerPlaylistPorID(id_playlist);
         res.render("AgregarCanciones",{cancionesPlaylist});
     } catch (e) {
         res.status(500).send({
@@ -208,6 +216,24 @@ app.get("/canciones", async (req, res) => {
     }
 })
 
+app.put("/canciones/:id_cancion", async (req, res) => {
+    const { id_cancion } = req.params
+    const { titulo, album, artista, comentario, enlace } = req.body;
+    try {
+        const cancion = await actualizarCancion({titulo, album, artista, comentario, enlace}, id_cancion);
+        console.log(req.body);
+        console.log(req.params);
+        console.log(cancion)    
+        res.send(cancion);
+    } catch (error) {
+        res.status(500).send({
+            error: `Algo salió mal... ${error}`,
+            code: 500
+        })
+    }
+});
+
+
 //eliminar canciones
 app.delete("/canciones/:id_cancion", async (req, res) => {
     const { id_cancion } = req.params;
@@ -224,7 +250,7 @@ app.delete("/canciones/:id_cancion", async (req, res) => {
 });
 
 //eliminar todas las canciones de una playlist
-app.delete("/canciones/:id_playlist", async (req, res) => {
+app.delete("/playlists/:id_playlist", async (req, res) => {
     const { id_playlist } = req.params;
     try {
         await vaciarPlaylist(id_playlist);
