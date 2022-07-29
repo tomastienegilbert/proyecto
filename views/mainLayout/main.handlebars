@@ -20,7 +20,26 @@
    <a href="/"><h1>La Playlist de tu vida</h1>
    <img src="logo.png" alt="logo" class="logo"></a>
    {{{body}}}
-{{!-- <script src="/axios/axios.min.js"></script>
-<script src="/js/bootstrap.bundle.min.js"></script> --}}
+{{!-- <script src="/axios/axios.min.js"></script> --}}
+{{!-- importar axios --}}
+{{!-- <script src="/node_modules/axios/dist/axios.min.js"></script> --}}
+<script src="/js/bootstrap.bundle.min.js"></script>
+<script>
+   //quitar token de localstorage al cerrar sesion
+      const cerrarSesion = () => {
+      localStorage.removeItem('token');
+      window.location.replace("/ingreso");
+   }
+
+   //obtener id_usuario de local storage
+   const datos_usuario = localStorage.getItem('datos usuario');
+   const id_usuario = JSON.parse(datos_usuario).id_usuario;
+   console.log(`la id de usuario es: ${id_usuario}`);
+
+   //ir a configPerfil correspondiente al perfil al apretar boton Perfil en Navbar
+   const configPerfil = (id_usuario) => {
+      window.location.replace(`/perfil/${id_usuario}`);
+   }
+</script>
 </body>
 </html>

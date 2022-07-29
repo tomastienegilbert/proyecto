@@ -40,3 +40,6 @@ CREATE TABLE canciones (
   id_playlist INTEGER NOT NULL,
   FOREIGN KEY (id_playlist) REFERENCES playlists(id_playlist)
 );
+
+--eliminar todas las canciones con determinada id_playlist
+DELETE FROM canciones WHERE id_playlist = 1;

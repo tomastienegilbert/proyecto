@@ -17,12 +17,6 @@ const nuevoUsuario = async ( { nombre, apellido, email, password, fecha_muerte }
   return result.rows[0]
 };
 
-//obtener usuarios de la base de datos
-const obtenerUsuarios = async () => {
-  const result = await pool.query(`SELECT * FROM usuarios`);
-  return result.rows;
-}
-
 //obtenerUsuarioEmail
 const obtenerUsuarioPorEmail = async (email) => {
   const result = await pool.query({
@@ -61,14 +55,14 @@ const obtenerPlaylistPorID = async (id_playlist) => {
 
 
 //Editar usuario
-const editarUsuario = async (usuario) => {
-  const values = Object.values(usuario)
-  const result = await pool.query(
-    `UPDATE usuarios SET email = '$1', password = '$2', nombre = '$3', apellido = '$4', fecha_muerte = '$5' WHERE id = '$6' RETURNING *`
-    , values);
-  return result.rows[0];
+const editarUsuario = async ({nombre, apellido, email, password, fecha_muerte}, id_usuario) => {
+  const values = Object.values({nombre, apellido, email, password, fecha_muerte}, id_usuario)
+  const result = await pool.query({
+    text: `UPDATE usuarios SET nombre = $1, apellido = $2, email = $3, password = $4, fecha_muerte = $5 WHERE id_usuario = $6 RETURNING *`,
+    values: [ usuario.nombre, usuario.apellido, usuario.email, usuario.password, usuario.fecha_muerte, usuario.id_usuario ]
+  })
+  return result.rows[0]
 }
-
 
 
 

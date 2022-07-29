@@ -33,6 +33,8 @@
 
       //enviar datos de playlist a local storage en el token
       localStorage.setItem("token", data.token);
+      localStorage.setItem(axios.defaults.headers.common['Authorization'], data.token);
+      axios.defaults.headers.common['Authorization'] = data.token;
       localStorage.setItem("datos playlist", JSON.stringify(data.playlist));
       localStorage.setItem("datos usuario", JSON.stringify(data.usuario));
 
@@ -43,7 +45,7 @@
       console.log(data);
 
       //redireccionar a vista de agregar canciones con parametro de playlist
-      window.location.replace(`/agregarCanciones/?token=${data.token}`);
+      window.location.replace(`/agregarCanciones/${id_playlist}`);
 
     } catch (e) {
       alert(e.response.data);

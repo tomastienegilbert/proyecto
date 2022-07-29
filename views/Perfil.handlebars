@@ -6,19 +6,27 @@
         <div class="form-group row w-50 m-auto">
             <div class="form-group col-12 col-sm-6">
                 <label>Nuevo email</label>
-                <input name="email" class="form-control m-auto" />
+                <input type="email" name="email" class="form-control m-auto" value="cambio@cambio.com" />
             </div>
             <div class="form-group col-12 col-sm-6">
                 <label>Nuevo nombre</label>
-                <input name="nombre" class="form-control m-auto" />
+                <input name="nombre" class="form-control m-auto" value="Cambio" />
+            </div>
+            <div class="form-group col-12 col-sm-6">
+                <label>Nuevo apellido</label>
+                <input name="apellido" class="form-control m-auto" value="Cambio" />
             </div>
             <div class="form-group col-12 col-sm-6">
                 <label>Password</label>
-                <input name="password" type="password" class="form-control m-auto"/>
+                <input id="pass1" type="password" class="form-control m-auto"value="encriptadacambio" />
             </div>
             <div class="form-group col-12 col-sm-6">
                 <label>Confirme nuevo password</label>
-                <input type="password" class="form-control m-auto" />
+                <input id="pass2" name="password" type="password" class="form-control m-auto" value="encriptadacambio" />
+            </div>
+            <div class="form-group col-12 col-sm-6">
+                <label>Nueva fecha de muerte</label>
+                <input type="date" class="form-control m-auto" value="" />
             </div>
 
         </div>
@@ -38,41 +46,39 @@
         alert("Debes iniciar sesión para configurar un perfil");
         window.location.replace("/ingreso");
     }
-    //const deleteBtn = document.getElementById("deleteBtn")
-    //const id = `{{user .id}}`
-    //deleteBtn.addEventListener("click", async () => {
-    //    try {
-    //        const { data: token } = await axios.delete(`/users/${id}`)
-    //        alert("Usuario eliminado con éxito")
-    //        window.location = `/`
-    //    } catch ({ response }) {
-    //        const { data } = response
-    //        const { error } = data
-    //        alert(error)
-    //    }
-    //})
-    //const form = document.querySelector("form")
-    //form.addEventListener("submit", async (e) => {
-    //    e.preventDefault()
-    //    let [email, nombre, password, repassword, años_experiencia, especialidad] = document.querySelectorAll("input")
-    //    nombre = nombre.value
-    //    password = password.value
-    //    años_experiencia = años_experiencia.value
-    //    especialidad = especialidad.value
-    //    const skater = {
-    //        nombre,
-    //        password,
-    //        años_experiencia,
-    //        especialidad
-    //    }
-    //    try {
-    //        await axios.put("/skaters", skater)
-    //        alert("Datos actualizados con éxito")
-    //        window.location = "/login"
-    //    } catch ({ response }) {
-    //        const { data } = response
-    //        const { error } = data
-    //        alert(error)
-    //    }
-    //})
+
+    //editar usuario
+    const form = document.querySelector("form");
+    document.querySelector("form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        //passwords deben coincidir
+        const pass1 = document.querySelector("#pass1").value;
+        const pass2 = document.querySelector("#pass2").value;
+        if (pass1 !== pass2) {
+            alert("Las contraseñas deben coincidir");
+            return;
+        }
+
+        //obtener id del usuario
+        //const datos_usuario = localStorage.getItem('datos usuario');
+        
+
+          try {
+            const response = await axios.put(`/usuarios/${id_usuario}`, {
+                email: document.querySelector("input[name='email']").value,
+                nombre: document.querySelector("input[name='nombre']").value,
+                apellido: document.querySelector("input[name='apellido']").value,
+                password: document.querySelector("input[name='password']").value,
+                fecha_muerte: document.querySelector("input[type='date']").value,
+            });
+            console.log(response.data);
+            alert("Perfil actualizado");
+            //actualizar página
+            window.location.reload();
+        } catch (e) {
+            console.log(e.response.data);
+            alert(e.response.data);
+        }
+    });  
 </script>
