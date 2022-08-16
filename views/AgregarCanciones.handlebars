@@ -29,6 +29,8 @@
     </form>
             <button class="m-auto btn btn-warning" id="aplicarCambios" style="display:none;">Aplicar Cambios</button>
     <hr>
+    <div id="embed-iframe"></div>
+    <hr>
     <div id="ListaCanciones">
         <h2>Tu Playlist</h2>
         <div class="container pt-5 w-75">
@@ -172,4 +174,9 @@
             alert(e.response.data)
         }
     }
+//llamar embeded
+    window.onSpotifyIframeApiReady = (IFrameAPI) => {
+  // 
+};
 </script>
+<script src="https://open.spotify.com/embed-podcast/iframe-api/v1" async></script>

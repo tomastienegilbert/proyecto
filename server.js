@@ -186,7 +186,7 @@ app.post("/ingresos", async (req, res) => {
       }
 
       // generar el token con id_playlist y usuario
-        const token = jwt.sign({ id_playlist: playlist.id_playlist, id_usuario: usuario.id_usuario }, secret_key);
+        const token = jwt.sign({ id_playlist: playlist.id_playlist, id_usuario: usuario.id_usuario, nombre_usuario: usuario.nombre }, secret_key);
       
         //res con toke, id_playlist, id_usuario e id_playlist borranro la password del usuario
         res.send({
